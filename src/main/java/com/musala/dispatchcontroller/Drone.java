@@ -1,6 +1,7 @@
 package com.musala.dispatchcontroller;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 public class Drone {
 
     @Id
+    @Size(max = 100)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String serialNumber;
 
