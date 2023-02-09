@@ -1,5 +1,6 @@
 package com.musala.dispatchcontroller;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,9 @@ public class DroneServiceImpl implements DroneService {
     @Override
     @Transactional(readOnly = true)
     public DroneResponse findById(@NotNull String droneSerialNumber) {
-        return null;
+        return droneRepository.findById(droneSerialNumber)
+                .map(this::buildDroneResponse)
+                .orElseThrow(() -> new EntityNotFoundException("Drone " + droneSerialNumber + " is not found"));
     }
 
     @NotNull
