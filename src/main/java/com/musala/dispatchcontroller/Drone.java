@@ -35,7 +35,7 @@ public class Drone {
     @Enumerated(EnumType.ORDINAL)
     private State state;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "load",
             joinColumns = @JoinColumn(name = "droneSerialNumber"),
@@ -47,7 +47,8 @@ public class Drone {
     }
 
     public enum Model {
-        Lightweight("L"), Middleweight("M"), Cruiserweight("C"), Heavyweight("H");
+        Lightweight("L"), Middleweight("M"),
+        Cruiserweight("C"), Heavyweight("H");
 
         private String code;
 
