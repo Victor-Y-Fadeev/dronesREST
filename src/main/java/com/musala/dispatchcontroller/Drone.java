@@ -35,7 +35,7 @@ public class Drone {
     @Enumerated(EnumType.ORDINAL)
     private State state;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "load",
             joinColumns = @JoinColumn(name = "droneSerialNumber"),

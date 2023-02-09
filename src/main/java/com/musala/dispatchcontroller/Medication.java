@@ -35,6 +35,6 @@ public class Medication {
     @Column(name = "image")
     private String image;
 
-    @ManyToMany(mappedBy = "loadedMedication")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "loadedMedication")
     Set<Drone> loadedDrones;
 }
