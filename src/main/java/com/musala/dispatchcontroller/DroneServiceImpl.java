@@ -5,7 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +20,9 @@ public class DroneServiceImpl implements DroneService {
     @Override
     @Transactional(readOnly = true)
     public List<DroneResponse> findAll() {
-        return null;
+        return droneRepository.findAll().stream()
+                .map(this::buildDroneResponse)
+                .collect(Collectors.toList());
     }
 
     @NotNull
@@ -45,5 +51,22 @@ public class DroneServiceImpl implements DroneService {
     @Transactional
     public void delete(@NotNull String droneSerialNumber) {
 
+    }
+
+    @NotNull
+    private DroneResponse buildDroneResponse(@NotNull Drone drone) {
+        return new DroneResponse()
+                .setSerialNumber(drone.getSerialNumber())
+                .setModel(drone.getModel())
+                .setWeightLimit(drone.getWeightLimit())
+                .setBatteryCapacity(drone.getBatteryCapacity())
+                .setState(drone.getState())
+                .setLoadedMedication(drone.getLoadedMedication().stream().map(
+                        medication -> new MedicationResponse()
+                                .setName(medication.getName())
+                                .setWeight(medication.getWeight())
+                                .setCode(medication.getCode())
+                                .setImage(medication.getImage())
+                        ).collect(Collectors.toSet()));
     }
 }
