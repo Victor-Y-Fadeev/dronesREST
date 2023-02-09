@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
 
+import java.util.Set;
 import java.util.stream.Stream;
 
 @Getter
@@ -33,6 +34,13 @@ public class Drone {
 
     @Enumerated(EnumType.ORDINAL)
     private State state;
+
+    @ManyToMany
+    @JoinTable(
+            name = "load",
+            joinColumns = @JoinColumn(name = "droneSerialNumber"),
+            inverseJoinColumns = @JoinColumn(name = "medicationCode"))
+    private Set<Medication> loadedMedication;
 
     public enum State {
         IDLE, LOADING, LOADED, DELIVERING, DELIVERED, RETURNING;

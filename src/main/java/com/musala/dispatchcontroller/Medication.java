@@ -8,6 +8,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.URL;
 
+import java.util.Set;
+
+
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -31,4 +34,7 @@ public class Medication {
     @URL
     @Column(name = "image")
     private String image;
+
+    @ManyToMany(mappedBy = "loadedMedication")
+    Set<Drone> loadedDrones;
 }
