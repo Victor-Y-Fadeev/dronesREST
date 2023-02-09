@@ -19,7 +19,7 @@ public class Drone {
 
     @Id
     @Size(max = 100)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "serialNumber", nullable = false, unique = true)
     private String serialNumber;
 
     private Model model;

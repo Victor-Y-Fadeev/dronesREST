@@ -28,7 +28,7 @@ public class Medication {
 
     @Id
     @Pattern(regexp = "[A-Z_0-9]+")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "code", nullable = false, unique = true)
     private String code;
 
     @URL
