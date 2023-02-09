@@ -38,7 +38,7 @@ public class DroneServiceImpl implements DroneService {
     @NotNull
     @Override
     @Transactional
-    public DroneResponse createUser(@NotNull CreateDroneRequest request) {
+    public DroneResponse createDrone(@NotNull CreateDroneRequest request) {
         return null;
     }
 
@@ -72,4 +72,6 @@ public class DroneServiceImpl implements DroneService {
                                 .setImage(medication.getImage())
                         ).collect(Collectors.toSet()));
     }
+
+
 }

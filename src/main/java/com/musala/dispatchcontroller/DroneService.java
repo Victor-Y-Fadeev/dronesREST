@@ -13,7 +13,7 @@ public interface DroneService {
     DroneResponse findById(@NotNull String droneSerialNumber);
 
     @NotNull
-    DroneResponse createUser(@NotNull CreateDroneRequest request);
+    DroneResponse createDrone(@NotNull CreateDroneRequest request);
 
     @NotNull
     DroneResponse update(@NotNull String droneSerialNumber, @NotNull CreateDroneRequest request);
