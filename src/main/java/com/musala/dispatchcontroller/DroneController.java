@@ -19,24 +19,24 @@ public class DroneController {
         return droneService.findAll();
     }
 
-    @GetMapping(value = "/{droneSerialNumber}", produces = APPLICATION_JSON_VALUE)
-    public DroneResponse findById(@PathVariable String droneSerialNumber) {
-        return droneService.findById(droneSerialNumber);
+    @GetMapping(value = "/{droneId}", produces = APPLICATION_JSON_VALUE)
+    public DroneResponse findById(@PathVariable String droneId) {
+        return droneService.findById(droneId);
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public DroneResponse create(@RequestBody CreateDroneRequest request) {
-        return droneService.createUser(request);
+        return droneService.createDrone(request);
     }
 
-    @PatchMapping(value = "/{droneSerialNumber}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public DroneResponse update(@PathVariable String droneSerialNumber, @RequestBody CreateDroneRequest request) {
-        return droneService.update(droneSerialNumber, request);
+    @PatchMapping(value = "/{droneId}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public DroneResponse update(@PathVariable String droneId, @RequestBody CreateDroneRequest request) {
+        return droneService.update(droneId, request);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(value = "/{droneSerialNumber}", produces = APPLICATION_JSON_VALUE)
-    public void delete(@PathVariable String droneSerialNumber) {
-        droneService.delete(droneSerialNumber);
+    @DeleteMapping(value = "/{droneId}", produces = APPLICATION_JSON_VALUE)
+    public void delete(@PathVariable String droneId) {
+        droneService.delete(droneId);
     }
 }

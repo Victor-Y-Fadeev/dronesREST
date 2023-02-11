@@ -13,5 +13,4 @@ public class DroneResponse {
     private Integer weightLimit;
     private Integer batteryCapacity;
     private Drone.State state;
-    private Set<MedicationResponse> loadedMedication;
 }

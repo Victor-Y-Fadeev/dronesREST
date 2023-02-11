@@ -10,13 +10,13 @@ public interface DroneService {
     List<DroneResponse> findAll();
 
     @NotNull
-    DroneResponse findById(@NotNull String droneSerialNumber);
+    DroneResponse findById(@NotNull String droneId);
 
     @NotNull
     DroneResponse createDrone(@NotNull CreateDroneRequest request);
 
     @NotNull
-    DroneResponse update(@NotNull String droneSerialNumber, @NotNull CreateDroneRequest request);
+    DroneResponse update(@NotNull String droneId, @NotNull CreateDroneRequest request);
 
-    void delete(@NotNull String droneSerialNumber);
+    void delete(@NotNull String droneId);
 }

@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.ofNullable;
+
 @Service
 @RequiredArgsConstructor
 public class DroneServiceImpl implements DroneService {
@@ -29,31 +31,34 @@ public class DroneServiceImpl implements DroneService {
     @NotNull
     @Override
     @Transactional(readOnly = true)
-    public DroneResponse findById(@NotNull String droneSerialNumber) {
-        return droneRepository.findById(droneSerialNumber)
+    public DroneResponse findById(@NotNull String droneId) {
+        return droneRepository.findById(droneId)
                 .map(this::buildDroneResponse)
-                .orElseThrow(() -> new EntityNotFoundException("Drone " + droneSerialNumber + " is not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Drone " + droneId + " is not found"));
     }
 
     @NotNull
     @Override
     @Transactional
     public DroneResponse createDrone(@NotNull CreateDroneRequest request) {
-        return null;
+        return buildDroneResponse(droneRepository.save(buildDroneRequest(request)));
     }
 
     @NotNull
     @Override
     @Transactional
-    public DroneResponse update(@NotNull String droneSerialNumber, @NotNull CreateDroneRequest request) {
-        return null;
+    public DroneResponse update(@NotNull String droneId, @NotNull CreateDroneRequest request) {
+        Drone drone = droneRepository.findById(droneId)
+                .orElseThrow(() -> new EntityNotFoundException("Drone " + droneId + " is not found"));
+        droneUpdate(drone, request);
+        return buildDroneResponse(droneRepository.save(drone));
     }
 
     @NotNull
     @Override
     @Transactional
-    public void delete(@NotNull String droneSerialNumber) {
-
+    public void delete(@NotNull String droneId) {
+        droneRepository.deleteById(droneId);
     }
 
     @NotNull
@@ -63,15 +68,24 @@ public class DroneServiceImpl implements DroneService {
                 .setModel(drone.getModel())
                 .setWeightLimit(drone.getWeightLimit())
                 .setBatteryCapacity(drone.getBatteryCapacity())
-                .setState(drone.getState())
-                .setLoadedMedication(drone.getLoadedMedication().stream().map(
-                        medication -> new MedicationResponse()
-                                .setName(medication.getName())
-                                .setWeight(medication.getWeight())
-                                .setCode(medication.getCode())
-                                .setImage(medication.getImage())
-                        ).collect(Collectors.toSet()));
+                .setState(drone.getState());
     }
 
+    @NotNull
+    private Drone buildDroneRequest(@NotNull CreateDroneRequest request) {
+        return new Drone()
+                .setSerialNumber(request.getSerialNumber())
+                .setModel(request.getModel())
+                .setWeightLimit(request.getWeightLimit())
+                .setBatteryCapacity(request.getBatteryCapacity())
+                .setState(request.getState());
+    }
 
+    private void droneUpdate(@NotNull Drone drone, @NotNull CreateDroneRequest request) {
+        ofNullable(request.getSerialNumber()).map(drone::setSerialNumber);
+        ofNullable(request.getModel()).map(drone::setModel);
+        ofNullable(request.getWeightLimit()).map(drone::setWeightLimit);
+        ofNullable(request.getBatteryCapacity()).map(drone::setBatteryCapacity);
+        ofNullable(request.getState()).map(drone::setState);
+    }
 }
