@@ -3,4 +3,6 @@ package com.musala.dispatchcontroller;
 import lombok.Data;
 
 @Data
-public record ExceptionResponse(String massage) { }
+public class ExceptionResponse {
+    private final String massage;
+}
