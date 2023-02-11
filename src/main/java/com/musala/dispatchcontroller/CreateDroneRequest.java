@@ -7,8 +7,8 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class CreateDroneRequest {
     private String serialNumber;
-    private Drone.Model model;
+    private Model model;
     private Integer weightLimit;
     private Integer batteryCapacity;
-    private Drone.State state;
+    private State state;
 }

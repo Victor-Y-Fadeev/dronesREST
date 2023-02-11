@@ -6,10 +6,10 @@ import jakarta.persistence.Converter;
 import java.util.stream.Stream;
 
 @Converter(autoApply = true)
-public class ModelConverter implements AttributeConverter<Drone.Model, String> {
+public class ModelConverter implements AttributeConverter<Model, String> {
 
     @Override
-    public String convertToDatabaseColumn(Drone.Model model) {
+    public String convertToDatabaseColumn(Model model) {
         if (model == null) {
             new IllegalArgumentException();
         }
@@ -18,12 +18,12 @@ public class ModelConverter implements AttributeConverter<Drone.Model, String> {
     }
 
     @Override
-    public Drone.Model convertToEntityAttribute(String code) {
+    public Model convertToEntityAttribute(String code) {
         if (code == null) {
             new IllegalArgumentException();
         }
 
-        return Stream.of(Drone.Model.values())
+        return Stream.of(Model.values())
                 .filter(model -> model.getCode().equals(code))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);

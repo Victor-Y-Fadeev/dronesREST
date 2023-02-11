@@ -8,7 +8,6 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.Set;
-import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -41,23 +40,4 @@ public class Drone {
             joinColumns = @JoinColumn(name = "droneSerialNumber"),
             inverseJoinColumns = @JoinColumn(name = "medicationCode"))
     private Set<Medication> loadedMedication;
-
-    public enum State {
-        IDLE, LOADING, LOADED, DELIVERING, DELIVERED, RETURNING;
-    }
-
-    public enum Model {
-        Lightweight("L"), Middleweight("M"),
-        Cruiserweight("C"), Heavyweight("H");
-
-        private String code;
-
-        private Model(String code) {
-            this.code = code;
-        }
-
-        public String getCode() {
-            return code;
-        }
-    }
 }
