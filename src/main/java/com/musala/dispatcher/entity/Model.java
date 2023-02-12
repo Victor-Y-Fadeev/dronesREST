@@ -1,4 +1,4 @@
-package com.musala.dispatchcontroller;
+package com.musala.dispatcher.entity;
 
 public enum Model {
     Lightweight("L"), Middleweight("M"),

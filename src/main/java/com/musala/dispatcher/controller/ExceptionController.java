@@ -1,5 +1,6 @@
-package com.musala.dispatchcontroller;
+package com.musala.dispatcher.controller;
 
+import com.musala.dispatcher.data.ExceptionResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;

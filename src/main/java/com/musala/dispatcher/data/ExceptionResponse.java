@@ -1,4 +1,4 @@
-package com.musala.dispatchcontroller;
+package com.musala.dispatcher.data;
 
 import lombok.Data;
 

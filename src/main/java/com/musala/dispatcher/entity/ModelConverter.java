@@ -1,4 +1,4 @@
-package com.musala.dispatchcontroller;
+package com.musala.dispatcher.entity;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

@@ -1,5 +1,7 @@
-package com.musala.dispatchcontroller;
+package com.musala.dispatcher.service;
 
+import com.musala.dispatcher.data.CreateDroneRequest;
+import com.musala.dispatcher.data.DroneResponse;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;

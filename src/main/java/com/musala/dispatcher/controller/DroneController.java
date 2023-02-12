@@ -1,5 +1,8 @@
-package com.musala.dispatchcontroller;
+package com.musala.dispatcher.controller;
 
+import com.musala.dispatcher.data.CreateDroneRequest;
+import com.musala.dispatcher.data.DroneResponse;
+import com.musala.dispatcher.service.DroneService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

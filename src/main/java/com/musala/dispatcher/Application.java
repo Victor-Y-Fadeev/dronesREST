@@ -1,4 +1,4 @@
-package com.musala.dispatchcontroller;
+package com.musala.dispatcher;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

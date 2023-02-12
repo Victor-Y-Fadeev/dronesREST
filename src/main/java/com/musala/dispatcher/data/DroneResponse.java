@@ -1,11 +1,13 @@
-package com.musala.dispatchcontroller;
+package com.musala.dispatcher.data;
 
+import com.musala.dispatcher.entity.Model;
+import com.musala.dispatcher.entity.State;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class CreateDroneRequest {
+public class DroneResponse {
     private String serialNumber;
     private Model model;
     private Integer weightLimit;
