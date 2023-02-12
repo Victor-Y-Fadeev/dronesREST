@@ -1,6 +1,6 @@
 package com.musala.dispatchcontroller;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +10,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/drones")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class DroneController {
     private DroneService droneService;
 

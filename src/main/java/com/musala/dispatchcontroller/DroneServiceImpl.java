@@ -2,7 +2,7 @@ package com.musala.dispatchcontroller;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 import static java.util.Optional.ofNullable;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class DroneServiceImpl implements DroneService {
-    private static DroneRepository droneRepository;
+    private DroneRepository droneRepository;
 
     @NotNull
     @Override
