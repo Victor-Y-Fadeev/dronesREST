@@ -18,21 +18,19 @@ import java.util.Set;
 @Table(name = "medications")
 public class Medication {
 
-    @Pattern(regexp = "[a-zA-Z_\\-]*")
-    @Column(name = "name")
+    @Pattern(regexp = "[a-zA-Z_0-9\\-]*")
     private String name;
 
     @Min(1)
-    @Column(name = "weight", nullable = false)
+    @Column(updatable = false, nullable = false)
     private Integer weight;
 
     @Id
     @Pattern(regexp = "[A-Z_0-9]+")
-    @Column(name = "code", nullable = false, unique = true)
+    @Column(updatable = false, nullable = false, unique = true)
     private String code;
 
     @URL
-    @Column(name = "image")
     private String image;
 
     @ManyToMany(
