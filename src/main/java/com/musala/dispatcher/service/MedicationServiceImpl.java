@@ -41,7 +41,7 @@ public class MedicationServiceImpl implements MedicationService {
     @NotNull
     @Override
     @Transactional
-    public MedicationResponse createMedication(@NotNull CreateMedicationRequest request) {
+    public MedicationResponse create(@NotNull CreateMedicationRequest request) {
         return buildMedicationResponse(medicationRepository.save(buildMedicationRequest(request)));
     }
 

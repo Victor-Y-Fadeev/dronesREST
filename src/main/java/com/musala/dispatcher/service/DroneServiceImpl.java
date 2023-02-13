@@ -41,7 +41,7 @@ public class DroneServiceImpl implements DroneService {
     @NotNull
     @Override
     @Transactional
-    public DroneResponse createDrone(@NotNull CreateDroneRequest request) {
+    public DroneResponse create(@NotNull CreateDroneRequest request) {
         return buildDroneResponse(droneRepository.save(buildDroneRequest(request)));
     }
 

@@ -29,7 +29,7 @@ public class MedicationController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public MedicationResponse create(@RequestBody CreateMedicationRequest request) {
-        return medicationService.createMedication(request);
+        return medicationService.create(request);
     }
 
     @PatchMapping(value = "/{medicationId}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

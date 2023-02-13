@@ -15,7 +15,7 @@ public interface MedicationService {
     MedicationResponse findById(@NotNull String medicationId);
 
     @NotNull
-    MedicationResponse createMedication(@NotNull CreateMedicationRequest request);
+    MedicationResponse create(@NotNull CreateMedicationRequest request);
 
     @NotNull
     MedicationResponse update(@NotNull String medicationId, @NotNull CreateMedicationRequest request);

@@ -29,7 +29,7 @@ public class DroneController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public DroneResponse create(@RequestBody CreateDroneRequest request) {
-        return droneService.createDrone(request);
+        return droneService.create(request);
     }
 
     @PatchMapping(value = "/{droneId}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
