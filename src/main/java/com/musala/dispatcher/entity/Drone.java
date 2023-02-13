@@ -39,12 +39,10 @@ public class Drone {
     @Column(nullable = false)
     private State state;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "load",
-            joinColumns = @JoinColumn(name = "droneSerialNumber"),
-            inverseJoinColumns = @JoinColumn(name = "medicationCode"))
-    private Set<Medication> loadedMedication;
+     @OneToMany(mappedBy = "drone",
+             fetch = FetchType.LAZY,
+             cascade = CascadeType.ALL)
+    private Set<Load> loads;
 
     @PrePersist
     public void fillDefault() {

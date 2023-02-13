@@ -33,9 +33,8 @@ public class Medication {
     @URL
     private String image;
 
-    @ManyToMany(
+    @OneToMany(mappedBy = "medication",
             fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            mappedBy = "loadedMedication")
-    Set<Drone> loadedDrones;
+            cascade = CascadeType.ALL)
+    private Set<Load> loads;
 }
