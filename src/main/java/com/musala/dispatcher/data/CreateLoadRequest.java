@@ -6,5 +6,5 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class CreateLoadRequest extends CreateMedicationRequest {
-    private String count;
+    private Integer count;
 }

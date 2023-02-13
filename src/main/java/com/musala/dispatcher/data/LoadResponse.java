@@ -6,5 +6,5 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class LoadResponse extends MedicationResponse {
-    private String count;
+    private Integer count;
 }
