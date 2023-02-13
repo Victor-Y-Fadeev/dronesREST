@@ -1,5 +1,6 @@
 package com.musala.dispatcher.service;
 
+import com.musala.dispatcher.controller.DroneSpec;
 import com.musala.dispatcher.data.CreateDroneRequest;
 import com.musala.dispatcher.data.DroneResponse;
 import com.musala.dispatcher.entity.Drone;
@@ -10,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,8 +25,8 @@ public class DroneServiceImpl implements DroneService {
     @NotNull
     @Override
     @Transactional(readOnly = true)
-    public List<DroneResponse> findAll() {
-        return droneRepository.findAll().stream()
+    public List<DroneResponse> findAll(DroneSpec droneSpec) {
+        return droneRepository.findAll(droneSpec).stream()
                 .map(this::buildDroneResponse)
                 .collect(Collectors.toList());
     }

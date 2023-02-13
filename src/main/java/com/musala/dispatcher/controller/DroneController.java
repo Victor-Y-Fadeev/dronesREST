@@ -18,8 +18,8 @@ public class DroneController {
     private DroneService droneService;
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public List<DroneResponse> findAll() {
-        return droneService.findAll();
+    public List<DroneResponse> findAll(DroneSpec droneSpec) {
+        return droneService.findAll(droneSpec);
     }
 
     @GetMapping(value = "/{droneId}", produces = APPLICATION_JSON_VALUE)
