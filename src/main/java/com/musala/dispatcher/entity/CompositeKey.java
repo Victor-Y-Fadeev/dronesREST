@@ -5,4 +5,9 @@ import java.io.Serializable;
 public class CompositeKey implements Serializable {
     private Drone drone;
     private Medication medication;
+
+    public CompositeKey(Drone drone, Medication medication) {
+        this.drone = drone;
+        this.medication = medication;
+    }
 }
