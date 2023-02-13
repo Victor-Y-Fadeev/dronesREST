@@ -4,10 +4,12 @@ import com.musala.dispatcher.entity.Drone;
 import com.musala.dispatcher.entity.State;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
-public interface DroneRepository extends JpaSpecificationExecutor<Drone>, JpaRepository<Drone, String> {
+public interface DroneRepository extends PagingAndSortingRepository<Drone, String>,
+        JpaSpecificationExecutor<Drone>, JpaRepository<Drone, String> {
 
     List<Drone> findByState(State state);
 

@@ -19,6 +19,7 @@ public class ExceptionController {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(RuntimeException.class)
     private ExceptionResponse error(RuntimeException ex) {
+        ex.printStackTrace();
         return new ExceptionResponse(ex.getMessage());
     }
 }
