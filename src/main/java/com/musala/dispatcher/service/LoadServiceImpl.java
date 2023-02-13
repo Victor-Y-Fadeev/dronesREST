@@ -1,8 +1,6 @@
 package com.musala.dispatcher.service;
 
-import com.musala.dispatcher.data.CreateDroneRequest;
 import com.musala.dispatcher.data.CreateLoadRequest;
-import com.musala.dispatcher.data.DroneResponse;
 import com.musala.dispatcher.data.LoadResponse;
 import com.musala.dispatcher.entity.Drone;
 import com.musala.dispatcher.entity.Load;
