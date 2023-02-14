@@ -142,6 +142,29 @@ public class DroneIntegrationTest {
     }
 
     @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideDrones")
+    public void testDronePatch(Drone drone) throws Exception {
+        Drone defaultDrone = DroneProvider.provideDefaultDrones().findFirst().get();
+        drone.setSerialNumber(defaultDrone.getSerialNumber());
+        repository.save(defaultDrone);
+
+        mvc.perform(patch("/drones/" + defaultDrone.getSerialNumber())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper()
+                                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                                .writeValueAsString(drone)))
+                .andExpect(status().isOk());
+
+        Drone found = repository.findById(defaultDrone.getSerialNumber()).get();
+        assertTrue(drone.getModel().equals(defaultDrone.getModel())
+                || !drone.getModel().equals(found.getModel()));
+        assertTrue(drone.getWeightLimit().equals(defaultDrone.getWeightLimit())
+                || !drone.getWeightLimit().equals(found.getWeightLimit()));
+        assertEquals(drone.getBatteryCapacity(), found.getBatteryCapacity());
+        assertEquals(drone.getState(), found.getState());
+    }
+
+    @ParameterizedTest
     @MethodSource("com.musala.dispatcher.DroneProvider#provideFilteringDronesByState")
     public void testDroneFilteringByState(Collection<Drone> list,
                                           State state) throws Exception {
