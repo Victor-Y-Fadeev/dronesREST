@@ -40,100 +40,100 @@ public class DroneIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("com.musala.dispatcher.DroneProvider#provideDefaultDrones")
-    public void testDefaultDroneGet(Drone expected) throws Exception {
-        repository.save(expected);
+    public void testDefaultDroneGet(Drone drone) throws Exception {
+        repository.save(drone);
 
         mvc.perform(get("/drones")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].serialNumber").value(expected.getSerialNumber()))
-                .andExpect(jsonPath("$[0].model").value(expected.getModel().name()))
-                .andExpect(jsonPath("$[0].weightLimit").value(expected.getWeightLimit()))
+                .andExpect(jsonPath("$[0].serialNumber").value(drone.getSerialNumber()))
+                .andExpect(jsonPath("$[0].model").value(drone.getModel().name()))
+                .andExpect(jsonPath("$[0].weightLimit").value(drone.getWeightLimit()))
                 .andExpect(jsonPath("$[0].batteryCapacity").value(0))
                 .andExpect(jsonPath("$[0].state").value(State.IDLE.name()));
 
-        mvc.perform(get("/drones/" + expected.getSerialNumber())
+        mvc.perform(get("/drones/" + drone.getSerialNumber())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("serialNumber").value(expected.getSerialNumber()))
-                .andExpect(jsonPath("model").value(expected.getModel().name()))
-                .andExpect(jsonPath("weightLimit").value(expected.getWeightLimit()))
+                .andExpect(jsonPath("serialNumber").value(drone.getSerialNumber()))
+                .andExpect(jsonPath("model").value(drone.getModel().name()))
+                .andExpect(jsonPath("weightLimit").value(drone.getWeightLimit()))
                 .andExpect(jsonPath("batteryCapacity").value(0))
                 .andExpect(jsonPath("state").value(State.IDLE.name()));
     }
 
     @ParameterizedTest
     @MethodSource("com.musala.dispatcher.DroneProvider#provideDefaultDrones")
-    public void testDefaultDronePost(Drone expected) throws Exception {
+    public void testDefaultDronePost(Drone drone) throws Exception {
         mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper()
                                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                                .writeValueAsString(expected)))
+                                .writeValueAsString(drone)))
                 .andExpect(status().isCreated());
 
-        Drone actual = repository.findById(expected.getSerialNumber()).get();
-        assertEquals(expected.getSerialNumber(), actual.getSerialNumber());
-        assertEquals(expected.getModel(), actual.getModel());
-        assertEquals(expected.getWeightLimit(), actual.getWeightLimit());
-        assertEquals(0, actual.getBatteryCapacity());
-        assertEquals(State.IDLE, actual.getState());
+        Drone found = repository.findById(drone.getSerialNumber()).get();
+        assertEquals(drone.getSerialNumber(), found.getSerialNumber());
+        assertEquals(drone.getModel(), found.getModel());
+        assertEquals(drone.getWeightLimit(), found.getWeightLimit());
+        assertEquals(0, found.getBatteryCapacity());
+        assertEquals(State.IDLE, found.getState());
     }
 
     @ParameterizedTest
     @MethodSource("com.musala.dispatcher.DroneProvider#provideDrones")
-    public void testDroneGet(Drone expected) throws Exception {
-        repository.save(expected);
+    public void testDroneGet(Drone drone) throws Exception {
+        repository.save(drone);
 
         mvc.perform(get("/drones")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].serialNumber").value(expected.getSerialNumber()))
-                .andExpect(jsonPath("$[0].model").value(expected.getModel().name()))
-                .andExpect(jsonPath("$[0].weightLimit").value(expected.getWeightLimit()))
-                .andExpect(jsonPath("$[0].batteryCapacity").value(expected.getBatteryCapacity()))
-                .andExpect(jsonPath("$[0].state").value(expected.getState().name()));
+                .andExpect(jsonPath("$[0].serialNumber").value(drone.getSerialNumber()))
+                .andExpect(jsonPath("$[0].model").value(drone.getModel().name()))
+                .andExpect(jsonPath("$[0].weightLimit").value(drone.getWeightLimit()))
+                .andExpect(jsonPath("$[0].batteryCapacity").value(drone.getBatteryCapacity()))
+                .andExpect(jsonPath("$[0].state").value(drone.getState().name()));
 
-        mvc.perform(get("/drones/" + expected.getSerialNumber())
+        mvc.perform(get("/drones/" + drone.getSerialNumber())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("serialNumber").value(expected.getSerialNumber()))
-                .andExpect(jsonPath("model").value(expected.getModel().name()))
-                .andExpect(jsonPath("weightLimit").value(expected.getWeightLimit()))
-                .andExpect(jsonPath("batteryCapacity").value(expected.getBatteryCapacity()))
-                .andExpect(jsonPath("state").value(expected.getState().name()));
+                .andExpect(jsonPath("serialNumber").value(drone.getSerialNumber()))
+                .andExpect(jsonPath("model").value(drone.getModel().name()))
+                .andExpect(jsonPath("weightLimit").value(drone.getWeightLimit()))
+                .andExpect(jsonPath("batteryCapacity").value(drone.getBatteryCapacity()))
+                .andExpect(jsonPath("state").value(drone.getState().name()));
     }
 
     @ParameterizedTest
     @MethodSource("com.musala.dispatcher.DroneProvider#provideDrones")
-    public void testDronePost(Drone expected) throws Exception {
+    public void testDronePost(Drone drone) throws Exception {
         mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper()
                                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                                .writeValueAsString(expected)))
+                                .writeValueAsString(drone)))
                 .andExpect(status().isCreated());
 
-        Drone actual = repository.findById(expected.getSerialNumber()).get();
-        assertEquals(expected.getSerialNumber(), actual.getSerialNumber());
-        assertEquals(expected.getModel(), actual.getModel());
-        assertEquals(expected.getWeightLimit(), actual.getWeightLimit());
-        assertEquals(expected.getBatteryCapacity(), actual.getBatteryCapacity());
-        assertEquals(expected.getState(), actual.getState());
+        Drone found = repository.findById(drone.getSerialNumber()).get();
+        assertEquals(drone.getSerialNumber(), found.getSerialNumber());
+        assertEquals(drone.getModel(), found.getModel());
+        assertEquals(drone.getWeightLimit(), found.getWeightLimit());
+        assertEquals(drone.getBatteryCapacity(), found.getBatteryCapacity());
+        assertEquals(drone.getState(), found.getState());
     }
 
     @ParameterizedTest
     @MethodSource("com.musala.dispatcher.DroneProvider#provideDrones")
-    public void testDroneDelete(Drone expected) throws Exception {
-        repository.save(expected);
+    public void testDroneDelete(Drone drone) throws Exception {
+        repository.save(drone);
 
-        mvc.perform(delete("/drones/" + expected.getSerialNumber())
+        mvc.perform(delete("/drones/" + drone.getSerialNumber())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -141,9 +141,9 @@ public class DroneIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.musala.dispatcher.DroneProvider#provideFilteringDrones")
-    public void testDroneFiltering(List<Drone> expected) throws Exception {
-        expected.forEach(repository::save);
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideFilteringDronesByStateAndBatteryCapacity")
+    public void testDroneFilteringByStateAndBatteryCapacity(List<Drone> list, State state, Integer batteryCapacity) throws Exception {
+        list.forEach(repository::save);
     }
 
     @AfterEach
