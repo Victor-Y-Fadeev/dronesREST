@@ -5,6 +5,10 @@ import com.musala.dispatcher.entity.Model;
 import com.musala.dispatcher.entity.State;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DroneProvider {
@@ -30,5 +34,15 @@ public class DroneProvider {
                                 + drone.getModel().getCode()
                                 + drone.getState().ordinal()
                                 + drone.getBatteryCapacity()));
+    }
+
+    public static Stream<List<Drone>> provideFilteringDrones() {
+        return provideDrones()
+                .collect(Collectors.groupingBy(Drone::getModel,
+                        Collectors.groupingBy(Drone::getWeightLimit)))
+                .values()
+                .stream()
+                .map(Map::values)
+                .flatMap(Collection::stream);
     }
 }

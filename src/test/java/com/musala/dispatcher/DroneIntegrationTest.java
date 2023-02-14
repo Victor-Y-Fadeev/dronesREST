@@ -17,6 +17,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -136,6 +138,12 @@ public class DroneIntegrationTest {
                 .andExpect(status().isNoContent());
 
         assertTrue(repository.findAll().isEmpty());
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideFilteringDrones")
+    public void testDroneFiltering(List<Drone> expected) throws Exception {
+        expected.forEach(repository::save);
     }
 
     @AfterEach
