@@ -12,8 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
         @Spec(
                 path = "batteryCapacity",
                 params = "battery",
-                spec = GreaterThanOrEqual.class
-        )
+                spec = GreaterThanOrEqual.class)
 })
 public interface DroneSpec extends Specification<Drone> {
 }
