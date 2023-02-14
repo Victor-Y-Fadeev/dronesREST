@@ -46,7 +46,7 @@ public class LoadServiceImpl implements LoadService {
         Load load = buildLoadRequest(drone, request);
 
         drone.getLoads().add(load);
-        droneRepository.save(drone);
+        droneRepository.saveAndFlush(drone);
         return buildLoadResponse(load);
     }
 
@@ -61,7 +61,7 @@ public class LoadServiceImpl implements LoadService {
         loadUpdate(load, request);
 
         drone.getLoads().add(load);
-        droneRepository.save(drone);
+        droneRepository.saveAndFlush(drone);
         return buildLoadResponse(load);
     }
 
@@ -103,7 +103,7 @@ public class LoadServiceImpl implements LoadService {
         return drone.getLoads().stream()
                 .filter(droneLoad -> droneLoad.getMedication().getCode().equals(request.getCode()))
                 .map(load -> load
-                        .setCount(load.getCount() + request.getCount()))
+                        .setCount(load.getCount() + ofNullable(request.getCount()).orElse(1)))
                 .findAny().orElse(new Load()
                         .setCount(request.getCount()))
                 .setDrone(drone)
