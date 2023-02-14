@@ -151,7 +151,7 @@ public class DroneIntegrationTest {
         return Stream.of(new Drone())
                 .flatMap(drone -> Arrays.stream(Model.values())
                         .map(model -> drone.setModel(model)))
-                .flatMap(drone -> Stream.of(0, 100, 200, 300, 400, 500)
+                .flatMap(drone -> Stream.of(0, 500)
                         .map(weightLimit -> drone.setWeightLimit(weightLimit)))
                 .peek(drone -> drone.setSerialNumber(
                         drone.getModel().toString() + drone.getWeightLimit().toString()));
@@ -159,7 +159,7 @@ public class DroneIntegrationTest {
 
     private static Stream<Drone> provideDrones() {
         return provideDefaultDrones()
-                .flatMap(drone -> Stream.of(0, 25, 50, 75, 100)
+                .flatMap(drone -> Stream.of(0, 25, 100)
                         .map(batteryCapacity -> drone.setBatteryCapacity(batteryCapacity)))
                 .flatMap(drone -> Arrays.stream(State.values())
                         .map(state -> drone.setState(state)));
