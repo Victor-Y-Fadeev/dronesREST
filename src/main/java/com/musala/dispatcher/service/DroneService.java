@@ -15,11 +15,9 @@ public interface DroneService {
     @NotNull
     DroneResponse findById(@NotNull String droneId);
 
-    @NotNull
-    DroneResponse create(@NotNull CreateDroneRequest request);
+    void create(@NotNull CreateDroneRequest request);
 
-    @NotNull
-    DroneResponse update(@NotNull String droneId, @NotNull CreateDroneRequest request);
+    void update(@NotNull String droneId, @NotNull CreateDroneRequest request);
 
     void delete(@NotNull String droneId);
 }

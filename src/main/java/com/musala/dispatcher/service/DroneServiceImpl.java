@@ -40,24 +40,21 @@ public class DroneServiceImpl implements DroneService {
                 .orElseThrow(() -> new EntityNotFoundException("Drone " + droneId + " is not found"));
     }
 
-    @NotNull
     @Override
     @Transactional
-    public DroneResponse create(@NotNull CreateDroneRequest request) {
-        return buildDroneResponse(droneRepository.saveAndFlush(buildDroneRequest(request)));
+    public void create(@NotNull CreateDroneRequest request) {
+        droneRepository.save(buildDroneRequest(request));
     }
 
-    @NotNull
     @Override
     @Transactional
-    public DroneResponse update(@NotNull String droneId, @NotNull CreateDroneRequest request) {
+    public void update(@NotNull String droneId, @NotNull CreateDroneRequest request) {
         Drone drone = droneRepository.findById(droneId)
                 .orElseThrow(() -> new EntityNotFoundException("Drone " + droneId + " is not found"));
         droneUpdate(drone, request);
-        return buildDroneResponse(droneRepository.saveAndFlush(drone));
+        droneRepository.save(drone);
     }
 
-    @NotNull
     @Override
     @Transactional
     public void delete(@NotNull String droneId) {

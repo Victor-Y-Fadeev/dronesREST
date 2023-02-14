@@ -28,18 +28,18 @@ public class DroneController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public DroneResponse create(@RequestBody CreateDroneRequest request) {
-        return droneService.create(request);
+    @PostMapping(consumes = APPLICATION_JSON_VALUE)
+    public void create(@RequestBody CreateDroneRequest request) {
+        droneService.create(request);
     }
 
-    @PatchMapping(value = "/{droneId}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public DroneResponse update(@PathVariable String droneId, @RequestBody CreateDroneRequest request) {
-        return droneService.update(droneId, request);
+    @PatchMapping(value = "/{droneId}", consumes = APPLICATION_JSON_VALUE)
+    public void update(@PathVariable String droneId, @RequestBody CreateDroneRequest request) {
+        droneService.update(droneId, request);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(value = "/{droneId}", produces = APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{droneId}")
     public void delete(@PathVariable String droneId) {
         droneService.delete(droneId);
     }
