@@ -7,8 +7,9 @@ import com.musala.dispatcher.entity.Model;
 import com.musala.dispatcher.entity.State;
 import com.musala.dispatcher.repository.DroneRepository;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -36,47 +40,52 @@ public class DroneIntegrationTest {
     @Autowired
     private DroneRepository repository;
 
-    @Test
-    public void testDroneDefaultsGet() throws Exception {
-        repository.save(new Drone()
-                .setSerialNumber("0")
-                .setModel(Model.Lightweight)
-                .setWeightLimit(0));
+    @ParameterizedTest
+    @MethodSource("provideDefaultDrones")
+    public void testDefaultDroneGet(Drone expected) throws Exception {
+        repository.save(expected);
 
         mvc.perform(get("/drones")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].serialNumber").value("0"))
-                .andExpect(jsonPath("$[0].model").value("Lightweight"))
-                .andExpect(jsonPath("$[0].weightLimit").value("0"))
-                .andExpect(jsonPath("$[0].batteryCapacity").value("0"))
-                .andExpect(jsonPath("$[0].state").value("IDLE"));
+                .andExpect(jsonPath("$[0].serialNumber").value(expected.getSerialNumber()))
+                .andExpect(jsonPath("$[0].model").value(expected.getModel().name()))
+                .andExpect(jsonPath("$[0].weightLimit").value(expected.getWeightLimit()))
+                .andExpect(jsonPath("$[0].batteryCapacity").value(0))
+                .andExpect(jsonPath("$[0].state").value(State.IDLE.name()));
     }
 
-
-    @Test
-    public void testDroneDefaultsPost() throws Exception {
+    @ParameterizedTest
+    @MethodSource("provideDefaultDrones")
+    public void testDefaultDronePost(Drone expected) throws Exception {
         mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper()
                                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                                .writeValueAsString(new Drone()
-                                        .setSerialNumber("0")
-                                        .setModel(Model.Lightweight)
-                                        .setWeightLimit(0))))
+                                .writeValueAsString(expected)))
                 .andExpect(status().isOk());
 
-        Drone drone = repository.findById("0").get();
-        assertEquals("0", drone.getSerialNumber());
-        assertEquals(Model.Lightweight, drone.getModel());
-        assertEquals(0, drone.getWeightLimit());
-        assertEquals(0, drone.getBatteryCapacity());
-        assertEquals(State.IDLE, drone.getState());
+        Drone actual = repository.findById(expected.getSerialNumber()).get();
+        assertEquals(expected.getSerialNumber(), actual.getSerialNumber());
+        assertEquals(expected.getModel(), actual.getModel());
+        assertEquals(expected.getWeightLimit(), actual.getWeightLimit());
+        assertEquals(0, actual.getBatteryCapacity());
+        assertEquals(State.IDLE, actual.getState());
     }
 
     @AfterEach
     public void cleanUp() {
         repository.deleteAll();
+    }
+
+    private static Stream<Drone> provideDefaultDrones() {
+        return Stream.of(new Drone())
+                .flatMap(drone -> Arrays.stream(Model.values())
+                        .map(model -> drone.setModel(model)))
+                .flatMap(drone -> Stream.of(0, 100, 200, 300, 400, 500)
+                        .map(weightLimit -> drone.setWeightLimit(weightLimit)))
+                .peek(drone -> drone.setSerialNumber(
+                        drone.getModel().toString() + drone.getWeightLimit().toString()));
     }
 }
