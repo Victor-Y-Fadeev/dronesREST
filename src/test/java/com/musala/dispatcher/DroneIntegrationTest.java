@@ -17,8 +17,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
+import java.util.Collection;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -141,9 +142,62 @@ public class DroneIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.musala.dispatcher.DroneProvider#provideFilteringDronesByStateAndBatteryCapacity")
-    public void testDroneFilteringByStateAndBatteryCapacity(List<Drone> list, State state, Integer batteryCapacity) throws Exception {
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideFilteringDronesByState")
+    public void testDroneFilteringByState(Collection<Drone> list,
+                                          State state) throws Exception {
         list.forEach(repository::save);
+
+        mvc.perform(get("/drones?state=" + state.name())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", hasSize((int) list.stream()
+                        .filter(drone -> drone.getState().equals(state))
+                        .count())));
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideFilteringDronesByBatteryCapacity")
+    public void testDroneFilteringByState(Collection<Drone> list,
+                                          Integer batteryCapacity) throws Exception {
+        list.forEach(repository::save);
+
+        mvc.perform(get("/drones?battery=" + batteryCapacity)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", hasSize((int) list.stream()
+                        .filter(drone -> drone.getBatteryCapacity() >= batteryCapacity)
+                        .count())));
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideFilteringDronesByStateAndBatteryCapacity")
+    public void testDroneFilteringByStateAndBatteryCapacity(Collection<Drone> list,
+                                                            State state, Integer batteryCapacity) throws Exception {
+        list.forEach(repository::save);
+
+        mvc.perform(get("/drones?state=" + state.name() + "&battery=" + batteryCapacity)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", hasSize((int) list.stream()
+                        .filter(drone -> drone.getState().equals(state))
+                        .filter(drone -> drone.getBatteryCapacity() >= batteryCapacity)
+                        .count())));
+
+        mvc.perform(get("/drones?battery=" + batteryCapacity + "&state=" + state.name())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", hasSize((int) list.stream()
+                        .filter(drone -> drone.getBatteryCapacity() >= batteryCapacity)
+                        .filter(drone -> drone.getState().equals(state))
+                        .count())));
     }
 
     @AfterEach

@@ -57,12 +57,21 @@ public class DroneProvider {
     }
 
     private static Stream<List<Drone>> provideFilteringDrones() {
-        return provideDrones()
+        return copyDrones(provideDrones())
                 .collect(Collectors.groupingBy(Drone::getModel,
                         Collectors.groupingBy(Drone::getWeightLimit)))
                 .values()
                 .stream()
                 .map(Map::values)
                 .flatMap(Collection::stream);
+    }
+
+    private static Stream<Drone> copyDrones(Stream<Drone> stream) {
+        return stream.map(drone -> new Drone()
+                .setSerialNumber(drone.getSerialNumber())
+                .setModel(drone.getModel())
+                .setWeightLimit(drone.getWeightLimit())
+                .setBatteryCapacity(drone.getBatteryCapacity())
+                .setState(drone.getState()));
     }
 }
