@@ -27,6 +27,7 @@ public class DroneController {
         return droneService.findById(droneId);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public DroneResponse create(@RequestBody CreateDroneRequest request) {
         return droneService.create(request);
