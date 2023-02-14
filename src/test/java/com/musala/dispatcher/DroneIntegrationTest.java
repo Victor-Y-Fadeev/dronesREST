@@ -3,7 +3,6 @@ package com.musala.dispatcher;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.musala.dispatcher.entity.Drone;
-import com.musala.dispatcher.entity.Model;
 import com.musala.dispatcher.entity.State;
 import com.musala.dispatcher.repository.DroneRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -17,9 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Arrays;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,7 +37,7 @@ public class DroneIntegrationTest {
     private DroneRepository repository;
 
     @ParameterizedTest
-    @MethodSource("provideDefaultDrones")
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideDefaultDrones")
     public void testDefaultDroneGet(Drone expected) throws Exception {
         repository.save(expected);
 
@@ -68,7 +64,7 @@ public class DroneIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideDefaultDrones")
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideDefaultDrones")
     public void testDefaultDronePost(Drone expected) throws Exception {
         mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -86,7 +82,7 @@ public class DroneIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideDrones")
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideDrones")
     public void testDroneGet(Drone expected) throws Exception {
         repository.save(expected);
 
@@ -113,7 +109,7 @@ public class DroneIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideDrones")
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideDrones")
     public void testDronePost(Drone expected) throws Exception {
         mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -131,7 +127,7 @@ public class DroneIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideDrones")
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideDrones")
     public void testDroneDelete(Drone expected) throws Exception {
         repository.save(expected);
 
@@ -145,23 +141,5 @@ public class DroneIntegrationTest {
     @AfterEach
     public void cleanUp() {
         repository.deleteAll();
-    }
-
-    private static Stream<Drone> provideDefaultDrones() {
-        return Stream.of(new Drone())
-                .flatMap(drone -> Arrays.stream(Model.values())
-                        .map(model -> drone.setModel(model)))
-                .flatMap(drone -> Stream.of(0, 500)
-                        .map(weightLimit -> drone.setWeightLimit(weightLimit)))
-                .peek(drone -> drone.setSerialNumber(
-                        drone.getModel().toString() + drone.getWeightLimit().toString()));
-    }
-
-    private static Stream<Drone> provideDrones() {
-        return provideDefaultDrones()
-                .flatMap(drone -> Stream.of(0, 25, 100)
-                        .map(batteryCapacity -> drone.setBatteryCapacity(batteryCapacity)))
-                .flatMap(drone -> Arrays.stream(State.values())
-                        .map(state -> drone.setState(state)));
     }
 }

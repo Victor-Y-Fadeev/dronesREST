@@ -1,9 +1,12 @@
 package com.musala.dispatcher.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.validator.constraints.Range;
@@ -53,5 +56,13 @@ public class Drone {
         if (state == null) {
             state = State.IDLE;
         }
+    }
+
+    @Override
+    @SneakyThrows
+    public String toString() {
+        return new ObjectMapper()
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .writeValueAsString(this);
     }
 }
