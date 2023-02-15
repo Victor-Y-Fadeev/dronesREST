@@ -1,8 +1,8 @@
 package com.musala.dispatcher;
 
-import com.musala.dispatcher.entity.Drone;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.musala.dispatcher.entity.Medication;
-import com.musala.dispatcher.repository.DroneRepository;
 import com.musala.dispatcher.repository.MedicationRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,10 +18,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -60,6 +60,57 @@ public class MedicationIntegrationTest {
                 .andExpect(jsonPath("weight").value(medication.getWeight()))
                 .andExpect(jsonPath("code").value(medication.getCode()))
                 .andExpect(jsonPath("image").value(medication.getImage()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.MedicationProvider#provideMedications")
+    public void testMedicationPost(Medication medication) throws Exception {
+        mvc.perform(post("/medications")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper()
+                                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                                .writeValueAsString(medication)))
+                .andExpect(status().isCreated());
+
+        Medication found = repository.findById(medication.getCode()).get();
+        assertEquals(medication.getName(), found.getName());
+        assertEquals(medication.getWeight(), found.getWeight());
+        assertEquals(medication.getCode(), found.getCode());
+        assertEquals(medication.getImage(), found.getImage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.MedicationProvider#provideMedications")
+    public void testMedicationPatch(Medication medication) throws Exception {
+        Medication defaultMedication = MedicationProvider.provideMedications().findFirst().get();
+        medication.setCode(defaultMedication.getCode());
+        repository.save(defaultMedication);
+
+        mvc.perform(patch("/medications/" + defaultMedication.getCode())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper()
+                                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                                .writeValueAsString(medication)))
+                .andExpect(status().isOk());
+
+
+        Medication found = repository.findById(medication.getCode()).get();
+        assertEquals(medication.getName(), found.getName());
+        assertTrue(medication.getWeight().equals(defaultMedication.getWeight())
+                || !medication.getWeight().equals(found.getWeight()));
+        assertEquals(medication.getImage(), found.getImage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.MedicationProvider#provideMedications")
+    public void testMedicationDelete(Medication medication) throws Exception {
+        repository.save(medication);
+
+        mvc.perform(delete("/medications/" + medication.getCode())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        assertTrue(repository.findAll().isEmpty());
     }
 
     @ParameterizedTest
