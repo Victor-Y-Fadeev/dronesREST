@@ -4,6 +4,7 @@ import com.musala.dispatcher.controller.DroneSpec;
 import com.musala.dispatcher.data.CreateDroneRequest;
 import com.musala.dispatcher.data.DroneResponse;
 import com.musala.dispatcher.entity.Drone;
+import com.musala.dispatcher.entity.State;
 import com.musala.dispatcher.repository.DroneRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
@@ -73,12 +74,15 @@ public class DroneServiceImpl implements DroneService {
 
     @NotNull
     private Drone buildDroneRequest(@NotNull CreateDroneRequest request) {
-        return new Drone()
+        Drone drone = new Drone()
                 .setSerialNumber(request.getSerialNumber())
                 .setModel(request.getModel())
                 .setWeightLimit(request.getWeightLimit())
                 .setBatteryCapacity(request.getBatteryCapacity())
                 .setState(request.getState());
+
+        droneValidate(drone);
+        return drone;
     }
 
     private void droneUpdate(@NotNull Drone drone, @NotNull CreateDroneRequest request) {
@@ -87,5 +91,14 @@ public class DroneServiceImpl implements DroneService {
         ofNullable(request.getWeightLimit()).map(drone::setWeightLimit);
         ofNullable(request.getBatteryCapacity()).map(drone::setBatteryCapacity);
         ofNullable(request.getState()).map(drone::setState);
+
+        droneValidate(drone);
+    }
+
+    private void droneValidate(@NotNull Drone drone) {
+        if (State.LOADING.equals(drone.getState())
+                && ofNullable(drone.getBatteryCapacity()).orElse(0) < 25) {
+            throw new IllegalArgumentException("Drone " + drone.getSerialNumber() + " battery level is below 25%");
+        }
     }
 }

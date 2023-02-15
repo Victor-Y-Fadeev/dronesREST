@@ -20,7 +20,8 @@ public class ExceptionController {
             JpaSystemException.class,
             TransactionSystemException.class,
             DataIntegrityViolationException.class,
-            HttpMessageNotReadableException.class
+            HttpMessageNotReadableException.class,
+            IllegalArgumentException.class
     })
     private ExceptionResponse badRequest(EntityNotFoundException ex) {
         return new ExceptionResponse(ex.getMessage());
