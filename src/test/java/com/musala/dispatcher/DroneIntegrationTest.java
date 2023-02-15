@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.musala.dispatcher.entity.Drone;
 import com.musala.dispatcher.entity.State;
 import com.musala.dispatcher.repository.DroneRepository;
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,8 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collection;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -131,18 +132,6 @@ public class DroneIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("com.musala.dispatcher.DroneProvider#provideDrones")
-    public void testDroneDelete(Drone drone) throws Exception {
-        repository.save(drone);
-
-        mvc.perform(delete("/drones/" + drone.getSerialNumber())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
-
-        assertTrue(repository.findAll().isEmpty());
-    }
-
-    @ParameterizedTest
-    @MethodSource("com.musala.dispatcher.DroneProvider#provideDrones")
     public void testDronePatch(Drone drone) throws Exception {
         Drone defaultDrone = DroneProvider.provideDefaultDrones().findFirst().get();
         drone.setSerialNumber(defaultDrone.getSerialNumber());
@@ -162,6 +151,18 @@ public class DroneIntegrationTest {
                 || !drone.getWeightLimit().equals(found.getWeightLimit()));
         assertEquals(drone.getBatteryCapacity(), found.getBatteryCapacity());
         assertEquals(drone.getState(), found.getState());
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideDrones")
+    public void testDroneDelete(Drone drone) throws Exception {
+        repository.save(drone);
+
+        mvc.perform(delete("/drones/" + drone.getSerialNumber())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        assertTrue(repository.findAll().isEmpty());
     }
 
     @ParameterizedTest
@@ -221,6 +222,19 @@ public class DroneIntegrationTest {
                         .filter(drone -> drone.getBatteryCapacity() >= batteryCapacity)
                         .filter(drone -> drone.getState().equals(state))
                         .count())));
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.DroneProvider#provideWrongSerialNumberDrones")
+    public void testWrongSerialNumberPost(Drone drone) throws Exception {
+        assertThrows(ServletException.class, () -> mvc.perform(post("/drones")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper()
+                                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                                .writeValueAsString(drone)))
+                .andExpect(status().isBadRequest()));
+
+        assertEquals(0, repository.count());
     }
 
     @AfterEach

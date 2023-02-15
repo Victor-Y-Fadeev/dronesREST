@@ -37,6 +37,12 @@ public class DroneProvider {
                                 + drone.getBatteryCapacity()));
     }
 
+    public static Stream<Drone> provideWrongSerialNumberDrones() {
+        return Stream.of(provideDefaultDrones().findFirst().get())
+                .flatMap(drone -> Stream.of(null, "", " ", "\t", "0".repeat(101))
+                        .map(serialNumber -> drone.setSerialNumber(serialNumber)));
+    }
+
     public static Stream<Arguments> provideFilteringDronesByState() {
         return provideFilteringDrones()
                 .flatMap(list -> Arrays.stream(State.values())

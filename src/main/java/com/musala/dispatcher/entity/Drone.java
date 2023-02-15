@@ -42,7 +42,7 @@ public class Drone {
     @Column(nullable = false)
     private State state;
 
-     @OneToMany(mappedBy = "drone",
+    @OneToMany(mappedBy = "drone",
              fetch = FetchType.LAZY,
              cascade = CascadeType.ALL)
     private Set<Load> loads;
