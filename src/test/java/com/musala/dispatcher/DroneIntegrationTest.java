@@ -244,7 +244,7 @@ public class DroneIntegrationTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "{", "}"})
+    @ValueSource(strings = {"", "{", "}", "/", "\\"})
     public void testWrongPost(String content) throws Exception {
         mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
