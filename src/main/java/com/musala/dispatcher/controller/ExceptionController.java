@@ -5,6 +5,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,7 +19,8 @@ public class ExceptionController {
     @ExceptionHandler({
             JpaSystemException.class,
             TransactionSystemException.class,
-            DataIntegrityViolationException.class
+            DataIntegrityViolationException.class,
+            HttpMessageNotReadableException.class
     })
     private ExceptionResponse badRequest(EntityNotFoundException ex) {
         return new ExceptionResponse(ex.getMessage());

@@ -43,6 +43,18 @@ public class DroneProvider {
                         .map(serialNumber -> drone.setSerialNumber(serialNumber)));
     }
 
+    public static Stream<Drone> provideWrongWeightLimitDrones() {
+        return Stream.of(provideDefaultDrones().findFirst().get())
+                .flatMap(drone -> Stream.of(null, -1, 501, Integer.MIN_VALUE, Integer.MAX_VALUE)
+                        .map(weightLimit -> drone.setWeightLimit(weightLimit)));
+    }
+
+    public static Stream<Drone> provideWrongBatteryCapacityDrones() {
+        return Stream.of(provideDefaultDrones().findFirst().get())
+                .flatMap(drone -> Stream.of(-1, 101, Integer.MIN_VALUE, Integer.MAX_VALUE)
+                        .map(batteryCapacity -> drone.setBatteryCapacity(batteryCapacity)));
+    }
+
     public static Stream<Arguments> provideFilteringDronesByState() {
         return provideFilteringDrones()
                 .flatMap(list -> Arrays.stream(State.values())

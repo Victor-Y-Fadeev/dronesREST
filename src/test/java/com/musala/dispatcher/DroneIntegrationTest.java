@@ -10,11 +10,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -225,8 +225,12 @@ public class DroneIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.musala.dispatcher.DroneProvider#provideWrongSerialNumberDrones")
-    public void testWrongSerialNumberPost(Drone drone) throws Exception {
+    @MethodSource({
+            "com.musala.dispatcher.DroneProvider#provideWrongSerialNumberDrones",
+            "com.musala.dispatcher.DroneProvider#provideWrongWeightLimitDrones",
+            "com.musala.dispatcher.DroneProvider#provideWrongBatteryCapacityDrones"
+    })
+    public void testWrongDronePost(Drone drone) throws Exception {
         assertThrows(ServletException.class, () -> mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper()
@@ -235,6 +239,15 @@ public class DroneIntegrationTest {
                 .andExpect(status().isBadRequest()));
 
         assertEquals(0, repository.count());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "{", "}"})
+    public void testWrongPost(String content) throws Exception {
+        mvc.perform(post("/drones")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
+                .andExpect(status().isBadRequest());
     }
 
     @AfterEach
