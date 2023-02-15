@@ -1,5 +1,8 @@
 package com.musala.dispatcher.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
@@ -18,7 +21,7 @@ import java.util.Set;
 @Table(name = "medications")
 public class Medication {
 
-    @Pattern(regexp = "[a-zA-Z_0-9\\-]*")
+    @Pattern(regexp = "[a-zA-Z_0-9\\-]+")
     private String name;
 
     @Min(1)
@@ -37,4 +40,15 @@ public class Medication {
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL)
     private Set<Load> loads;
+
+    @Override
+    public String toString() {
+        try {
+            return new ObjectMapper()
+                    .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                    .writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            return super.toString();
+        }
+    }
 }

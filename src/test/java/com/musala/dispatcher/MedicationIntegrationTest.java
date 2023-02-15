@@ -1,10 +1,13 @@
 package com.musala.dispatcher;
 
+import com.musala.dispatcher.entity.Drone;
+import com.musala.dispatcher.entity.Medication;
 import com.musala.dispatcher.repository.DroneRepository;
 import com.musala.dispatcher.repository.MedicationRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -32,6 +36,31 @@ public class MedicationIntegrationTest {
 
     @Autowired
     private MedicationRepository repository;
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.MedicationProvider#provideMedications")
+    public void testMedicationGet(Medication medication) throws Exception {
+        repository.save(medication);
+
+        mvc.perform(get("/medications")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].name").value(medication.getName()))
+                .andExpect(jsonPath("$[0].weight").value(medication.getWeight()))
+                .andExpect(jsonPath("$[0].code").value(medication.getCode()))
+                .andExpect(jsonPath("$[0].image").value(medication.getImage()));
+
+        mvc.perform(get("/medications/" + medication.getCode())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("name").value(medication.getName()))
+                .andExpect(jsonPath("weight").value(medication.getWeight()))
+                .andExpect(jsonPath("code").value(medication.getCode()))
+                .andExpect(jsonPath("image").value(medication.getImage()));
+    }
 
     @ParameterizedTest
     @ValueSource(strings = {"", "{", "}", "/", "\\"})
