@@ -1,7 +1,9 @@
 package com.musala.dispatcher;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.musala.dispatcher.data.CreateDroneRequest;
 import com.musala.dispatcher.entity.Drone;
 import com.musala.dispatcher.entity.State;
 import com.musala.dispatcher.repository.DroneRepository;
@@ -73,9 +75,7 @@ public class DroneIntegrationTest {
     public void testDefaultDronePost(Drone drone) throws Exception {
         mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper()
-                                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                                .writeValueAsString(drone)))
+                        .content(droneToRequest(drone)))
                 .andExpect(status().isCreated());
 
         Drone found = repository.findById(drone.getSerialNumber()).get();
@@ -118,9 +118,7 @@ public class DroneIntegrationTest {
     public void testDronePost(Drone drone) throws Exception {
         mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper()
-                                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                                .writeValueAsString(drone)))
+                        .content(droneToRequest(drone)))
                 .andExpect(status().isCreated());
 
         Drone found = repository.findById(drone.getSerialNumber()).get();
@@ -140,9 +138,7 @@ public class DroneIntegrationTest {
 
         mvc.perform(patch("/drones/" + defaultDrone.getSerialNumber())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper()
-                                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                                .writeValueAsString(drone)))
+                        .content(droneToRequest(drone)))
                 .andExpect(status().isOk());
 
         Drone found = repository.findById(defaultDrone.getSerialNumber()).get();
@@ -235,9 +231,7 @@ public class DroneIntegrationTest {
     public void testWrongDronePost(Drone drone) throws Exception {
         assertThrows(ServletException.class, () -> mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper()
-                                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                                .writeValueAsString(drone)))
+                        .content(droneToRequest(drone)))
                 .andExpect(status().isBadRequest()));
 
         assertEquals(0, repository.count());
@@ -264,5 +258,16 @@ public class DroneIntegrationTest {
     @AfterEach
     public void cleanUp() {
         repository.deleteAll();
+    }
+
+    private static String droneToRequest(Drone drone) throws JsonProcessingException {
+        return new ObjectMapper()
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .writeValueAsString(new CreateDroneRequest()
+                        .setSerialNumber(drone.getSerialNumber())
+                        .setModel(drone.getModel())
+                        .setWeightLimit(drone.getWeightLimit())
+                        .setBatteryCapacity(drone.getBatteryCapacity())
+                        .setState(drone.getState()));
     }
 }

@@ -1,7 +1,11 @@
 package com.musala.dispatcher;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.musala.dispatcher.data.CreateDroneRequest;
+import com.musala.dispatcher.data.CreateMedicationRequest;
+import com.musala.dispatcher.entity.Drone;
 import com.musala.dispatcher.entity.Medication;
 import com.musala.dispatcher.repository.MedicationRepository;
 import jakarta.servlet.ServletException;
@@ -67,9 +71,7 @@ public class MedicationIntegrationTest {
     public void testMedicationPost(Medication medication) throws Exception {
         mvc.perform(post("/medications")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper()
-                                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                                .writeValueAsString(medication)))
+                        .content(medicationToRequest(medication)))
                 .andExpect(status().isCreated());
 
         Medication found = repository.findById(medication.getCode()).get();
@@ -88,9 +90,7 @@ public class MedicationIntegrationTest {
 
         mvc.perform(patch("/medications/" + defaultMedication.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper()
-                                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                                .writeValueAsString(medication)))
+                        .content(medicationToRequest(medication)))
                 .andExpect(status().isOk());
 
 
@@ -122,9 +122,7 @@ public class MedicationIntegrationTest {
     public void testWrongMedicationPost(Medication medication) throws Exception {
         assertThrows(ServletException.class, () -> mvc.perform(post("/medications")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper()
-                                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                                .writeValueAsString(medication)))
+                        .content(medicationToRequest(medication)))
                 .andExpect(status().isBadRequest()));
 
         assertEquals(0, repository.count());
@@ -151,5 +149,15 @@ public class MedicationIntegrationTest {
     @AfterEach
     public void cleanUp() {
         repository.deleteAll();
+    }
+
+    private static String medicationToRequest(Medication medication) throws JsonProcessingException {
+        return new ObjectMapper()
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .writeValueAsString(new CreateMedicationRequest()
+                        .setName(medication.getName())
+                        .setWeight(medication.getWeight())
+                        .setCode(medication.getCode())
+                        .setImage(medication.getImage()));
     }
 }
