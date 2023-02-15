@@ -228,7 +228,8 @@ public class DroneIntegrationTest {
     @MethodSource({
             "com.musala.dispatcher.DroneProvider#provideWrongSerialNumberDrones",
             "com.musala.dispatcher.DroneProvider#provideWrongWeightLimitDrones",
-            "com.musala.dispatcher.DroneProvider#provideWrongBatteryCapacityDrones"
+            "com.musala.dispatcher.DroneProvider#provideWrongBatteryCapacityDrones",
+            "com.musala.dispatcher.DroneProvider#provideWrongStateAndBatteryCapacityDrones"
     })
     public void testWrongDronePost(Drone drone) throws Exception {
         assertThrows(ServletException.class, () -> mvc.perform(post("/drones")

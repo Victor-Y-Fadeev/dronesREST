@@ -25,16 +25,8 @@ public class DroneProvider {
     }
 
     public static Stream<Drone> provideDrones() {
-        return provideDefaultDrones()
-                .flatMap(drone -> Stream.of(0, 25, 100)
-                        .map(batteryCapacity -> drone.setBatteryCapacity(batteryCapacity)))
-                .flatMap(drone -> Arrays.stream(State.values())
-                        .map(state -> drone.setState(state)))
-                .map(drone -> drone.setSerialNumber(
-                        drone.getWeightLimit()
-                                + drone.getModel().getCode()
-                                + drone.getState().ordinal()
-                                + drone.getBatteryCapacity()));
+        return provideAllDrones()
+                .filter(drone -> !isWrongStateAndBatteryCapacity(drone));
     }
 
     public static Stream<Drone> provideWrongSerialNumberDrones() {
@@ -53,6 +45,11 @@ public class DroneProvider {
         return Stream.of(provideDefaultDrones().findFirst().get())
                 .flatMap(drone -> Stream.of(-1, 101, Integer.MIN_VALUE, Integer.MAX_VALUE)
                         .map(batteryCapacity -> drone.setBatteryCapacity(batteryCapacity)));
+    }
+
+    public static Stream<Drone> provideWrongStateAndBatteryCapacityDrones() {
+        return provideAllDrones()
+                .filter(drone -> isWrongStateAndBatteryCapacity(drone));
     }
 
     public static Stream<Arguments> provideFilteringDronesByState() {
@@ -91,5 +88,23 @@ public class DroneProvider {
                 .setWeightLimit(drone.getWeightLimit())
                 .setBatteryCapacity(drone.getBatteryCapacity())
                 .setState(drone.getState()));
+    }
+
+    private static Stream<Drone> provideAllDrones() {
+        return provideDefaultDrones()
+                .flatMap(drone -> Stream.of(0, 25, 100)
+                        .map(batteryCapacity -> drone.setBatteryCapacity(batteryCapacity)))
+                .flatMap(drone -> Arrays.stream(State.values())
+                        .map(state -> drone.setState(state)))
+                .map(drone -> drone.setSerialNumber(
+                        drone.getWeightLimit()
+                                + drone.getModel().getCode()
+                                + drone.getState().ordinal()
+                                + drone.getBatteryCapacity()));
+    }
+
+    private static boolean isWrongStateAndBatteryCapacity(Drone drone) {
+        return drone.getBatteryCapacity() < 25
+                && drone.getState().equals(State.LOADING);
     }
 }
