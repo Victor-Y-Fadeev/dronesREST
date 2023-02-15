@@ -38,24 +38,21 @@ public class MedicationServiceImpl implements MedicationService {
                 .orElseThrow(() -> new EntityNotFoundException("Medication " + medicationId + " is not found"));
     }
 
-    @NotNull
     @Override
     @Transactional
-    public MedicationResponse create(@NotNull CreateMedicationRequest request) {
-        return buildMedicationResponse(medicationRepository.saveAndFlush(buildMedicationRequest(request)));
+    public void create(@NotNull CreateMedicationRequest request) {
+        medicationRepository.save(buildMedicationRequest(request));
     }
 
-    @NotNull
     @Override
     @Transactional
-    public MedicationResponse update(@NotNull String medicationId, @NotNull CreateMedicationRequest request) {
+    public void update(@NotNull String medicationId, @NotNull CreateMedicationRequest request) {
         Medication medication = medicationRepository.findById(medicationId)
                 .orElseThrow(() -> new EntityNotFoundException("Medication " + medicationId + " is not found"));
         medicationUpdate(medication, request);
-        return buildMedicationResponse(medicationRepository.saveAndFlush(medication));
+        medicationRepository.save(medication);
     }
 
-    @NotNull
     @Override
     @Transactional
     public void delete(@NotNull String medicationId) {

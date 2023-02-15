@@ -27,18 +27,19 @@ public class MedicationController {
         return medicationService.findById(medicationId);
     }
 
-    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public MedicationResponse create(@RequestBody CreateMedicationRequest request) {
-        return medicationService.create(request);
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(consumes = APPLICATION_JSON_VALUE)
+    public void create(@RequestBody CreateMedicationRequest request) {
+        medicationService.create(request);
     }
 
-    @PatchMapping(value = "/{medicationId}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public MedicationResponse update(@PathVariable String medicationId, @RequestBody CreateMedicationRequest request) {
-        return medicationService.update(medicationId, request);
+    @PatchMapping(value = "/{medicationId}", consumes = APPLICATION_JSON_VALUE)
+    public void update(@PathVariable String medicationId, @RequestBody CreateMedicationRequest request) {
+        medicationService.update(medicationId, request);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(value = "/{medicationId}", produces = APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{medicationId}")
     public void delete(@PathVariable String medicationId) {
         medicationService.delete(medicationId);
     }
