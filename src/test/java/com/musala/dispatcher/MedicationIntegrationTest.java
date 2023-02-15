@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.musala.dispatcher.entity.Medication;
 import com.musala.dispatcher.repository.MedicationRepository;
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,8 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -111,6 +111,23 @@ public class MedicationIntegrationTest {
                 .andExpect(status().isNoContent());
 
         assertTrue(repository.findAll().isEmpty());
+    }
+
+    @ParameterizedTest
+    @MethodSource({
+            "com.musala.dispatcher.MedicationProvider#provideWrongNameMedications",
+            "com.musala.dispatcher.MedicationProvider#provideWrongWeightMedications",
+            "com.musala.dispatcher.MedicationProvider#provideWrongCodeMedications"
+    })
+    public void testWrongMedicationPost(Medication medication) throws Exception {
+        assertThrows(ServletException.class, () -> mvc.perform(post("/medications")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper()
+                                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                                .writeValueAsString(medication)))
+                .andExpect(status().isBadRequest()));
+
+        assertEquals(0, repository.count());
     }
 
     @ParameterizedTest
