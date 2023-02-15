@@ -48,6 +48,7 @@ public class Drone {
     private Set<Load> loads;
 
     @PrePersist
+    @PreUpdate
     public void fillDefault() {
         if (batteryCapacity == null) {
             batteryCapacity = 0;

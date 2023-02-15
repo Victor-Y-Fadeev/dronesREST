@@ -8,6 +8,7 @@ import com.musala.dispatcher.entity.Medication;
 import com.musala.dispatcher.repository.MedicationRepository;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -142,6 +143,17 @@ public class MedicationIntegrationTest {
         mvc.perform(get("/medications/" + serialNumber)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testDuplicateMedicationPost() throws Exception {
+        Medication medication = MedicationProvider.provideMedications().findFirst().get();
+        repository.save(medication);
+
+        mvc.perform(post("/medications")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(medicationToRequest(medication)))
+                .andExpect(status().isCreated());
     }
 
     @AfterEach

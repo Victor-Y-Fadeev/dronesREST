@@ -9,6 +9,7 @@ import com.musala.dispatcher.entity.State;
 import com.musala.dispatcher.repository.DroneRepository;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -253,6 +254,17 @@ public class DroneIntegrationTest {
         mvc.perform(get("/drones/" + serialNumber)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testDuplicateMedicationPost() throws Exception {
+        Drone drone = DroneProvider.provideDefaultDrones().findFirst().get();
+        repository.save(drone);
+
+        mvc.perform(post("/drones")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(droneToRequest(drone)))
+                .andExpect(status().isCreated());
     }
 
     @AfterEach
