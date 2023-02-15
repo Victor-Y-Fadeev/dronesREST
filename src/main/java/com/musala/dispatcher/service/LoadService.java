@@ -13,11 +13,9 @@ public interface LoadService {
     @NotNull
     LoadResponse findById(@NotNull String droneId, @NotNull String medicationId);
 
-    @NotNull
-    LoadResponse create(@NotNull String droneId, @NotNull CreateLoadRequest request);
+    void create(@NotNull String droneId, @NotNull CreateLoadRequest request);
 
-    @NotNull
-    LoadResponse update(@NotNull String droneId,
+    void update(@NotNull String droneId,
                         @NotNull String medicationId,
                         @NotNull CreateLoadRequest request);
 

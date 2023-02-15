@@ -5,6 +5,7 @@ import com.musala.dispatcher.data.LoadResponse;
 import com.musala.dispatcher.entity.Drone;
 import com.musala.dispatcher.entity.Load;
 import com.musala.dispatcher.entity.Medication;
+import com.musala.dispatcher.entity.State;
 import com.musala.dispatcher.repository.DroneRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
@@ -38,39 +39,35 @@ public class LoadServiceImpl implements LoadService {
         return buildLoadResponse(findLoadById(findDroneById(droneId), medicationId));
     }
 
-    @NotNull
     @Override
     @Transactional
-    public LoadResponse create(@NotNull String droneId, @NotNull CreateLoadRequest request) {
+    public void create(@NotNull String droneId, @NotNull CreateLoadRequest request) {
         Drone drone = findDroneById(droneId);
         Load load = buildLoadRequest(drone, request);
 
         drone.getLoads().add(load);
-        droneRepository.saveAndFlush(drone);
-        return buildLoadResponse(load);
+        droneRepository.save(drone);
     }
 
-    @NotNull
     @Override
     @Transactional
-    public LoadResponse update(@NotNull String droneId,
+    public void update(@NotNull String droneId,
                                @NotNull String medicationId,
                                @NotNull CreateLoadRequest request) {
         Drone drone = findDroneById(droneId);
         Load load = findLoadById(drone, medicationId);
-        loadUpdate(load, request);
 
-        drone.getLoads().add(load);
-        droneRepository.saveAndFlush(drone);
-        return buildLoadResponse(load);
+        loadUpdate(load, request);
+        droneRepository.save(drone);
     }
 
-    @NotNull
     @Override
     @Transactional
     public void delete(@NotNull String droneId, @NotNull String medicationId) {
         Drone drone = findDroneById(droneId);
-        drone.getLoads().removeIf(load -> load.getMedication().getCode().equals(medicationId));
+        Load load = findLoadById(drone, medicationId);
+
+        drone.getLoads().remove(load);
         droneRepository.save(drone);
     }
 
@@ -100,18 +97,16 @@ public class LoadServiceImpl implements LoadService {
 
     @NotNull
     private Load buildLoadRequest(@NotNull Drone drone, @NotNull CreateLoadRequest request) {
-        return drone.getLoads().stream()
-                .filter(droneLoad -> droneLoad.getMedication().getCode().equals(request.getCode()))
-                .map(load -> load
-                        .setCount(load.getCount() + ofNullable(request.getCount()).orElse(1)))
-                .findAny().orElse(new Load()
-                        .setCount(request.getCount()))
-                .setDrone(drone)
+        Load load = new Load().setDrone(drone)
+                .setCount(request.getCount())
                 .setMedication(new Medication()
-                        .setName(request.getName())
-                        .setWeight(request.getWeight())
-                        .setCode(request.getCode())
-                        .setImage(request.getImage()));
+                                .setName(request.getName())
+                                .setWeight(request.getWeight())
+                                .setCode(request.getCode())
+                                .setImage(request.getImage()));
+
+        loadValidate(load);
+        return load;
     }
 
     private void loadUpdate(@NotNull Load load, @NotNull CreateLoadRequest request) {
@@ -122,5 +117,16 @@ public class LoadServiceImpl implements LoadService {
         ofNullable(request.getWeight()).map(medication::setWeight);
         ofNullable(request.getCode()).map(medication::setCode);
         ofNullable(request.getImage()).map(medication::setImage);
+
+        loadValidate(load);
+    }
+
+    private void loadValidate(@NotNull Load load) {
+        if (load.getDrone().getLoads().stream()
+                .filter(droneLoad -> !droneLoad.getMedication().getCode().equals(load.getMedication().getCode()))
+                .mapToInt(droneLoad -> droneLoad.getMedication().getWeight() * droneLoad.getCount()).sum()
+                + load.getMedication().getWeight() * load.getCount() > load.getDrone().getWeightLimit()) {
+            throw new IllegalArgumentException("Drone " + load.getDrone().getSerialNumber() + " is overloaded");
+        }
     }
 }

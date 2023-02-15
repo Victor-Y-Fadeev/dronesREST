@@ -28,21 +28,22 @@ public class LoadController {
         return loadService.findById(droneId, medicationId);
     }
 
-    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public LoadResponse create(@PathVariable String droneId,
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(consumes = APPLICATION_JSON_VALUE)
+    public void create(@PathVariable String droneId,
                                @RequestBody CreateLoadRequest request) {
-        return loadService.create(droneId, request);
+        loadService.create(droneId, request);
     }
 
-    @PatchMapping(value = "/{medicationId}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public LoadResponse update(@PathVariable String droneId,
+    @PatchMapping(value = "/{medicationId}", consumes = APPLICATION_JSON_VALUE)
+    public void update(@PathVariable String droneId,
                                @PathVariable String medicationId,
                                @RequestBody CreateLoadRequest request) {
-        return loadService.update(droneId, medicationId, request);
+        loadService.update(droneId, medicationId, request);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(value = "/{medicationId}", produces = APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{medicationId}")
     public void delete(@PathVariable String droneId, @PathVariable String medicationId) {
         loadService.delete(droneId, medicationId);
     }
