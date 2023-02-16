@@ -9,8 +9,8 @@ import com.musala.dispatcher.entity.Load;
 import com.musala.dispatcher.entity.Medication;
 import com.musala.dispatcher.repository.DroneRepository;
 import com.musala.dispatcher.repository.MedicationRepository;
-import org.hibernate.Hibernate;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -23,9 +23,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -46,10 +46,43 @@ public class LoadIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("com.musala.dispatcher.LoadProvider#provideLoads")
-    public void testLoadPost(Drone drone, Medication medication) throws Exception {
-        droneRepository.save(drone);
+    public void testLoadGet(Drone drone, Medication medication) throws Exception {
         medicationRepository.save(medication);
+        droneRepository.save(drone);
 
+        drone = droneRepository.findById(drone.getSerialNumber()).get();
+        drone.getLoads().add(new Load()
+                .setDrone(drone).setMedication(medication));
+        droneRepository.save(drone);
+
+        mvc.perform(get("/drones/" + drone.getSerialNumber() + "/medications")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].name").value(medication.getName()))
+                .andExpect(jsonPath("$[0].weight").value(medication.getWeight()))
+                .andExpect(jsonPath("$[0].code").value(medication.getCode()))
+                .andExpect(jsonPath("$[0].image").value(medication.getImage()))
+                .andExpect(jsonPath("$[0].count").value(1));
+
+        mvc.perform(get("/drones/" + drone.getSerialNumber()
+                + "/medications/" + medication.getCode())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("name").value(medication.getName()))
+                .andExpect(jsonPath("weight").value(medication.getWeight()))
+                .andExpect(jsonPath("code").value(medication.getCode()))
+                .andExpect(jsonPath("image").value(medication.getImage()))
+                .andExpect(jsonPath("count").value(1));;
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.LoadProvider#provideLoads")
+    public void testLoadPost(Drone drone, Medication medication) throws Exception {
+        medicationRepository.save(medication);
+        droneRepository.save(drone);
 
         mvc.perform(post("/drones/" + drone.getSerialNumber() + "/medications")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -61,6 +94,33 @@ public class LoadIntegrationTest {
         assertEquals(drone, load.getDrone());
         assertEquals(medication, load.getMedication());
         assertEquals(1, load.getCount());
+    }
+
+    @Test
+    public void testDependenciesDelete() throws Exception {
+        Drone drone = DroneProvider.provideDrones().findFirst().get();
+        Medication medication = MedicationProvider.provideMedications().findFirst().get();
+
+        assertEquals(0, medicationRepository.count());
+        medicationRepository.save(medication);
+        assertEquals(1, medicationRepository.count());
+
+        assertEquals(0, droneRepository.count());
+        droneRepository.save(drone);
+        assertEquals(1, droneRepository.count());
+
+        drone = droneRepository.findById(drone.getSerialNumber()).get();
+        drone.getLoads().add(new Load()
+                .setDrone(drone).setMedication(medication));
+        droneRepository.save(drone);
+
+        assertEquals(1, droneRepository.count());
+        droneRepository.deleteAll();
+        assertEquals(0, droneRepository.count());
+
+        assertEquals(1, medicationRepository.count());
+        medicationRepository.deleteAll();
+        assertEquals(0, medicationRepository.count());
     }
 
     @AfterEach
