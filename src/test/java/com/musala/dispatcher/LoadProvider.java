@@ -9,12 +9,20 @@ import java.util.stream.Stream;
 
 public class LoadProvider {
 
-    private static Stream<Arguments> provideLoads() {
+    public static Stream<Arguments> provideLoads() {
         return provideReducedDrones()
                 .map(drone -> drone.setWeightLimit(250))
                 .flatMap(drone -> provideReducedMedications()
                         .filter(medication -> medication.getWeight() <= drone.getWeightLimit())
                         .map(medication -> Arguments.of(drone, medication)));
+    }
+
+    public static Stream<Arguments> provideMultipleLoads() {
+        return provideReducedDrones()
+                .flatMap(drone -> provideReducedMedications()
+                        .filter(medication -> 2 * medication.getWeight() <= drone.getWeightLimit())
+                        .map(medication -> Arguments.of(drone, medication,
+                                drone.getWeightLimit() / medication.getWeight())));
     }
 
     private static Stream<Drone> provideReducedDrones() {
