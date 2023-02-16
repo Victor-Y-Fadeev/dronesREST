@@ -9,6 +9,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.URL;
 
 import java.util.Set;
@@ -36,6 +38,7 @@ public class Medication {
     @URL
     private String image;
 
+    @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "medication",
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL)

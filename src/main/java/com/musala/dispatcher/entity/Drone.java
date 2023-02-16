@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.Set;
@@ -42,6 +44,7 @@ public class Drone {
     @Column(nullable = false)
     private State state;
 
+    @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "drone",
              fetch = FetchType.LAZY,
              cascade = CascadeType.ALL)

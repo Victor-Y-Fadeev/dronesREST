@@ -10,8 +10,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.ColumnDefault;
 
-import java.io.Serializable;
-
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -36,6 +34,7 @@ public class Load {
     private Integer count;
 
     @PrePersist
+    @PreUpdate
     public void fillDefault() {
         if (count == null) {
             count = 1;
