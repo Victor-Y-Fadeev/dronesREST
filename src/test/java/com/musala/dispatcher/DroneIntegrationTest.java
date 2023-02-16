@@ -257,7 +257,7 @@ public class DroneIntegrationTest {
     }
 
     @Test
-    public void testDuplicateMedicationPost() throws Exception {
+    public void testDuplicateDronePost() throws Exception {
         Drone drone = DroneProvider.provideDefaultDrones().findFirst().get();
         repository.save(drone);
 

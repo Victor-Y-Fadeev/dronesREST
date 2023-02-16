@@ -5,7 +5,6 @@ import com.musala.dispatcher.data.LoadResponse;
 import com.musala.dispatcher.entity.Drone;
 import com.musala.dispatcher.entity.Load;
 import com.musala.dispatcher.entity.Medication;
-import com.musala.dispatcher.entity.State;
 import com.musala.dispatcher.repository.DroneRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
@@ -124,8 +123,10 @@ public class LoadServiceImpl implements LoadService {
     private void loadValidate(@NotNull Load load) {
         if (load.getDrone().getLoads().stream()
                 .filter(droneLoad -> !droneLoad.getMedication().getCode().equals(load.getMedication().getCode()))
-                .mapToInt(droneLoad -> droneLoad.getMedication().getWeight() * droneLoad.getCount()).sum()
-                + load.getMedication().getWeight() * load.getCount() > load.getDrone().getWeightLimit()) {
+                .mapToInt(droneLoad ->
+                        droneLoad.getMedication().getWeight() * ofNullable(load.getCount()).orElse(1)).sum()
+                + load.getMedication().getWeight() * ofNullable(load.getCount()).orElse(1)
+                > load.getDrone().getWeightLimit()) {
             throw new IllegalArgumentException("Drone " + load.getDrone().getSerialNumber() + " is overloaded");
         }
     }
