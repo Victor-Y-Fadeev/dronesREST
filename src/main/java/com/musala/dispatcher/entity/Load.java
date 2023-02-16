@@ -10,6 +10,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -39,6 +41,25 @@ public class Load {
         if (count == null) {
             count = 1;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof Load)) {
+            return false;
+        }
+
+        return drone.equals(((Load) o).drone)
+                && medication.equals(((Load) o).medication);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(drone, medication);
     }
 
     @Override

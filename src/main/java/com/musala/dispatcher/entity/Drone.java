@@ -13,6 +13,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.Range;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
@@ -46,8 +47,8 @@ public class Drone {
 
     @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "drone",
-             fetch = FetchType.LAZY,
-             cascade = CascadeType.ALL)
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
     private Set<Load> loads;
 
     @PrePersist
@@ -60,6 +61,24 @@ public class Drone {
         if (state == null) {
             state = State.IDLE;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof Drone)) {
+            return false;
+        }
+
+        return serialNumber.equals(((Drone) o).serialNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(serialNumber);
     }
 
     @Override

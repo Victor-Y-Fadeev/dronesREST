@@ -13,6 +13,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.URL;
 
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -43,6 +44,24 @@ public class Medication {
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL)
     private Set<Load> loads;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof Medication)) {
+            return false;
+        }
+
+        return code.equals(((Medication) o).code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code);
+    }
 
     @Override
     public String toString() {
