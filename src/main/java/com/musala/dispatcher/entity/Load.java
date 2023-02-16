@@ -43,6 +43,12 @@ public class Load {
         }
     }
 
+    @PreRemove
+    public void removeDependencies() {
+        drone.getLoads().remove(this);
+        medication.getLoads().remove(this);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this) {
