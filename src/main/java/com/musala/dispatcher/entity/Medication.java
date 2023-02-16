@@ -42,8 +42,14 @@ public class Medication {
     @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "medication",
             fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private Set<Load> loads;
+
+    @PreRemove
+    public void removeDependencies() {
+        loads.clear();
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -48,7 +48,8 @@ public class Drone {
     @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "drone",
             fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private Set<Load> loads;
 
     @PrePersist
@@ -61,6 +62,11 @@ public class Drone {
         if (state == null) {
             state = State.IDLE;
         }
+    }
+
+    @PreRemove
+    public void removeDependencies() {
+        loads.clear();
     }
 
     @Override

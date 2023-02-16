@@ -23,8 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -94,6 +93,28 @@ public class LoadIntegrationTest {
         assertEquals(drone, load.getDrone());
         assertEquals(medication, load.getMedication());
         assertEquals(1, load.getCount());
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.LoadProvider#provideLoads")
+    public void testLoadDelete(Drone drone, Medication medication) throws Exception {
+        medicationRepository.save(medication);
+        droneRepository.save(drone);
+
+        drone = droneRepository.findById(drone.getSerialNumber()).get();
+        drone.getLoads().add(new Load()
+                .setDrone(drone).setMedication(medication));
+        droneRepository.save(drone);
+
+        mvc.perform(delete("/drones/" + drone.getSerialNumber()
+                        + "/medications/" + medication.getCode())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        assertEquals(1, droneRepository.count());
+        assertEquals(1, medicationRepository.count());
+        assertEquals(0, droneRepository
+                .findById(drone.getSerialNumber()).get().getLoads().size());
     }
 
     @Test
