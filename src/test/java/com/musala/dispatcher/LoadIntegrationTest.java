@@ -122,6 +122,60 @@ public class LoadIntegrationTest {
                 .findById(drone.getSerialNumber()).get().getLoads().size());
     }
 
+//    @ParameterizedTest
+//    @MethodSource("com.musala.dispatcher.LoadProvider#provideWrongLoads")
+//    public void testWrongLoadPost(Medication correct, Medication wrong) throws Exception {
+//        medicationRepository.save(correct);
+//        Drone drone = DroneProvider.provideDrones().findFirst().get()
+//                .setWeightLimit(correct.getWeight());
+//        droneRepository.save(drone);
+//
+//        mvc.perform(post("/drones/" + drone.getSerialNumber() + "/medications")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(loadToRequest(wrong)))
+//                .andExpect(status().isBadRequest());
+//
+//        assertTrue(droneRepository.findById(drone.getSerialNumber()).get()
+//                .getLoads().isEmpty());
+//    }
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.LoadProvider#provideMultipleLoads")
+    public void testDroneOverLoadByCopies(Drone drone, Medication medication, Integer count)
+            throws Exception {
+        medicationRepository.save(medication);
+        droneRepository.save(drone);
+
+        mvc.perform(post("/drones/" + drone.getSerialNumber() + "/medications")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loadToRequest(medication, count + 1)))
+                .andExpect(status().isBadRequest());
+
+        assertTrue(droneRepository.findById(drone.getSerialNumber()).get()
+                .getLoads().isEmpty());
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.musala.dispatcher.LoadProvider#provideMultipleLoads")
+    public void testDroneOverLoadByDifferent(Drone drone, Medication medication, Integer count)
+            throws Exception {
+        saveLoad(drone, medication, count);
+
+        Medication other = MedicationProvider.provideMedications()
+                .filter(provided -> !provided.equals(medication))
+                .filter(provided -> medication.getWeight() <= provided.getWeight())
+                .findFirst().get();
+        medicationRepository.save(other);
+
+        mvc.perform(post("/drones/" + drone.getSerialNumber() + "/medications")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loadToRequest(other)))
+                .andExpect(status().isBadRequest());
+
+        assertEquals(1, droneRepository.findById(drone.getSerialNumber()).get()
+                .getLoads().size());
+    }
+
     @Test
     public void testDuplicatePost() throws Exception {
         Medication medication = MedicationProvider.provideMedications().findFirst().get();

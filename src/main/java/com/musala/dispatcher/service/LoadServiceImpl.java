@@ -128,7 +128,7 @@ public class LoadServiceImpl implements LoadService {
         if (load.getDrone().getLoads().stream()
                 .filter(droneLoad -> !droneLoad.getMedication().equals(load.getMedication()))
                 .mapToInt(droneLoad ->
-                        droneLoad.getMedication().getWeight() * ofNullable(load.getCount()).orElse(1)).sum()
+                        droneLoad.getMedication().getWeight() * ofNullable(droneLoad.getCount()).orElse(1)).sum()
                 + load.getMedication().getWeight() * ofNullable(load.getCount()).orElse(1)
                 > load.getDrone().getWeightLimit()) {
             throw new IllegalArgumentException("Drone " + load.getDrone().getSerialNumber() + " is overloaded");
