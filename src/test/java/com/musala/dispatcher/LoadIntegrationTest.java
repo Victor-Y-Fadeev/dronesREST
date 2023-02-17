@@ -161,6 +161,44 @@ public class LoadIntegrationTest {
                 .getLoads().size());
     }
 
+    @Test
+    public void testDroneOverLoadFake() throws Exception {
+        Medication medication = MedicationProvider.provideMedications().findFirst().get();
+        Drone drone = DroneProvider.provideDrones().findFirst().get()
+                .setWeightLimit(medication.getWeight());
+
+        medicationRepository.save(medication);
+        droneRepository.save(drone);
+
+        mvc.perform(post("/drones/" + drone.getSerialNumber() + "/medications")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loadToRequest(medication.setWeight(2 * medication.getWeight()))))
+                .andExpect(status().isCreated());
+
+        assertEquals(1, droneRepository.findById(drone.getSerialNumber()).get()
+                .getLoads().size());
+    }
+
+    @Test
+    public void testWrongLoadRequest() throws Exception {
+        Medication medication = MedicationProvider.provideMedications().findFirst().get();
+        Drone drone = DroneProvider.provideDrones().findFirst().get()
+                .setWeightLimit(medication.getWeight());
+
+        Integer weight = medication.getWeight();
+        medicationRepository.save(medication.setWeight(2 * weight));
+        medication.setWeight(weight);
+        droneRepository.save(drone);
+
+        mvc.perform(post("/drones/" + drone.getSerialNumber() + "/medications")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loadToRequest(medication)))
+                .andExpect(status().isBadRequest());
+
+        assertTrue(droneRepository.findById(drone.getSerialNumber()).get()
+                .getLoads().isEmpty());
+    }
+
     @ParameterizedTest
     @MethodSource("com.musala.dispatcher.LoadProvider#provideWrongLoads")
     public void testWrongLoadPost(Drone drone, Medication medication) throws Exception {
