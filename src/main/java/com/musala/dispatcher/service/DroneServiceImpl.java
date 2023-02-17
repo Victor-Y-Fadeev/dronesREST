@@ -43,7 +43,8 @@ public class DroneServiceImpl implements DroneService {
     @Override
     @Transactional
     public void create(@NotNull CreateDroneRequest request) {
-        if (droneRepository.existsById(request.getSerialNumber())) {
+        if (ofNullable(request.getSerialNumber())
+                .map(droneRepository::existsById).orElse(false)) {
             throw new IllegalArgumentException("Drone " + request.getSerialNumber() + " is already there");
         }
 
