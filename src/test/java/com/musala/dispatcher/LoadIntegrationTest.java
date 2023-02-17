@@ -194,6 +194,25 @@ public class LoadIntegrationTest {
     }
 
     @ParameterizedTest
+    @ValueSource(ints = {Integer.MIN_VALUE, -1, 0})
+    public void testWrongLoadCountPost(Integer count) throws Exception {
+        Medication medication = MedicationProvider.provideMedications().findFirst().get();
+        Drone drone = DroneProvider.provideDrones().findFirst().get()
+                .setWeightLimit(medication.getWeight());
+
+        medicationRepository.save(medication);
+        droneRepository.save(drone);
+
+        mvc.perform(post("/drones/" + drone.getSerialNumber() + "/medications")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loadToRequest(medication, count)))
+                .andExpect(status().isBadRequest());
+
+        assertTrue(droneRepository.findById(drone.getSerialNumber()).get()
+                .getLoads().isEmpty());
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"", "{", "}", "/", "\\"})
     public void testWrongPost(String content) throws Exception {
         Drone drone = DroneProvider.provideDrones().findFirst().get();
