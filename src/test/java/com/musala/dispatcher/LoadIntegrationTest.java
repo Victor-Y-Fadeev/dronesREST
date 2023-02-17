@@ -179,6 +179,21 @@ public class LoadIntegrationTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"0", "_", "A"})
+    public void testWrongLoadIdPost(String code) throws Exception {
+        Medication medication = MedicationProvider.provideMedications().findFirst().get()
+                .setCode(code);
+        Drone drone = DroneProvider.provideDrones().findFirst().get()
+                .setWeightLimit(medication.getWeight());
+        droneRepository.save(drone);
+
+        mvc.perform(post("/drones/" + drone.getSerialNumber() + "/medications")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loadToRequest(medication)))
+                .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"", "{", "}", "/", "\\"})
     public void testWrongPost(String content) throws Exception {
         Drone drone = DroneProvider.provideDrones().findFirst().get();
