@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.musala.dispatcher.data.CreateMedicationRequest;
 import com.musala.dispatcher.entity.Medication;
 import com.musala.dispatcher.repository.MedicationRepository;
-import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +21,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -119,10 +119,10 @@ public class MedicationIntegrationTest {
             "com.musala.dispatcher.MedicationProvider#provideWrongCodeMedications"
     })
     public void testWrongMedicationPost(Medication medication) throws Exception {
-        assertThrows(ServletException.class, () -> mvc.perform(post("/medications")
+        mvc.perform(post("/medications")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(medicationToRequest(medication)))
-                .andExpect(status().isBadRequest()));
+                .andExpect(status().isBadRequest());
 
         assertEquals(0, repository.count());
     }
@@ -150,10 +150,10 @@ public class MedicationIntegrationTest {
         Medication medication = MedicationProvider.provideMedications().findFirst().get();
         repository.save(medication);
 
-        assertThrows(ServletException.class, () -> mvc.perform(post("/medications")
+        mvc.perform(post("/medications")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(medicationToRequest(medication)))
-                .andExpect(status().isBadRequest()));
+                .andExpect(status().isBadRequest());
     }
 
     @AfterEach

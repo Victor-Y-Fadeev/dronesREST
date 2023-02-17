@@ -6,7 +6,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -17,14 +16,13 @@ public class ExceptionController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({
-            JpaSystemException.class,
             TransactionSystemException.class,
             DataIntegrityViolationException.class,
             InvalidDataAccessApiUsageException.class,
             HttpMessageNotReadableException.class,
             IllegalArgumentException.class
     })
-    private ExceptionResponse badRequest(EntityNotFoundException ex) {
+    private ExceptionResponse badRequest(Exception ex) {
         return new ExceptionResponse(ex.getMessage());
     }
 

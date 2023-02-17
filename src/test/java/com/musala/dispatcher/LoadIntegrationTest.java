@@ -9,7 +9,6 @@ import com.musala.dispatcher.entity.Load;
 import com.musala.dispatcher.entity.Medication;
 import com.musala.dispatcher.repository.DroneRepository;
 import com.musala.dispatcher.repository.MedicationRepository;
-import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +22,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -129,11 +129,11 @@ public class LoadIntegrationTest {
         Drone drone = DroneProvider.provideDefaultDrones().findFirst().get();
         saveLoad(drone, medication);
 
-        assertThrows(ServletException.class, () -> mvc.perform(post("/drones/"
+        mvc.perform(post("/drones/"
                         + drone.getSerialNumber() + "/medications")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loadToRequest(medication)))
-                .andExpect(status().isBadRequest()));
+                .andExpect(status().isBadRequest());
     }
 
     @Test

@@ -7,7 +7,6 @@ import com.musala.dispatcher.data.CreateDroneRequest;
 import com.musala.dispatcher.entity.Drone;
 import com.musala.dispatcher.entity.State;
 import com.musala.dispatcher.repository.DroneRepository;
-import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +25,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collection;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -230,10 +230,10 @@ public class DroneIntegrationTest {
             "com.musala.dispatcher.DroneProvider#provideWrongStateAndBatteryCapacityDrones"
     })
     public void testWrongDronePost(Drone drone) throws Exception {
-        assertThrows(ServletException.class, () -> mvc.perform(post("/drones")
+        mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(droneToRequest(drone)))
-                .andExpect(status().isBadRequest()));
+                .andExpect(status().isBadRequest());
 
         assertEquals(0, repository.count());
     }
@@ -261,10 +261,10 @@ public class DroneIntegrationTest {
         Drone drone = DroneProvider.provideDefaultDrones().findFirst().get();
         repository.save(drone);
 
-        assertThrows(ServletException.class, () -> mvc.perform(post("/drones")
+        mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(droneToRequest(drone)))
-                .andExpect(status().isBadRequest()));
+                .andExpect(status().isBadRequest());
     }
 
     @AfterEach
