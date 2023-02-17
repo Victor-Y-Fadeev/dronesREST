@@ -264,7 +264,7 @@ public class DroneIntegrationTest {
         assertThrows(ServletException.class, () -> mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(droneToRequest(drone)))
-                .andExpect(status().isCreated()));
+                .andExpect(status().isBadRequest()));
     }
 
     @AfterEach

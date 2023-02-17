@@ -153,7 +153,7 @@ public class MedicationIntegrationTest {
         assertThrows(ServletException.class, () -> mvc.perform(post("/medications")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(medicationToRequest(medication)))
-                .andExpect(status().isCreated()));
+                .andExpect(status().isBadRequest()));
     }
 
     @AfterEach
