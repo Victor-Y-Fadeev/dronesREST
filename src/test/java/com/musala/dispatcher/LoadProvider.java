@@ -25,6 +25,14 @@ public class LoadProvider {
                                 drone.getWeightLimit() / medication.getWeight())));
     }
 
+    public static Stream<Arguments> provideWrongLoads() {
+        return DroneProvider.provideDrones()
+                .filter(drone -> drone.getModel().equals(Model.Lightweight))
+                .flatMap(drone -> provideReducedMedications()
+                        .filter(medication -> drone.getWeightLimit() < medication.getWeight())
+                        .map(medication -> Arguments.of(drone, medication)));
+    }
+
     private static Stream<Drone> provideReducedDrones() {
         return DroneProvider.provideDrones()
                 .filter(drone -> drone.getWeightLimit() != 0)
