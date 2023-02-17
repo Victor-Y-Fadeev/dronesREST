@@ -41,6 +41,10 @@ public class MedicationServiceImpl implements MedicationService {
     @Override
     @Transactional
     public void create(@NotNull CreateMedicationRequest request) {
+        if (medicationRepository.existsById(request.getCode())) {
+            throw new IllegalArgumentException("Medication " + request.getCode() + " is already there");
+        }
+
         medicationRepository.save(buildMedicationRequest(request));
     }
 

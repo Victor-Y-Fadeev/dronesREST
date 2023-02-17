@@ -150,10 +150,10 @@ public class MedicationIntegrationTest {
         Medication medication = MedicationProvider.provideMedications().findFirst().get();
         repository.save(medication);
 
-        mvc.perform(post("/medications")
+        assertThrows(ServletException.class, () -> mvc.perform(post("/medications")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(medicationToRequest(medication)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated()));
     }
 
     @AfterEach

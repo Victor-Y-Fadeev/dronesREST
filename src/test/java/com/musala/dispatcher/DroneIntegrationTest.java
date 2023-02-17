@@ -261,10 +261,10 @@ public class DroneIntegrationTest {
         Drone drone = DroneProvider.provideDefaultDrones().findFirst().get();
         repository.save(drone);
 
-        mvc.perform(post("/drones")
+        assertThrows(ServletException.class, () -> mvc.perform(post("/drones")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(droneToRequest(drone)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated()));
     }
 
     @AfterEach

@@ -3,6 +3,7 @@ package com.musala.dispatcher.controller;
 import com.musala.dispatcher.data.ExceptionResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -19,6 +20,7 @@ public class ExceptionController {
             JpaSystemException.class,
             TransactionSystemException.class,
             DataIntegrityViolationException.class,
+            InvalidDataAccessApiUsageException.class,
             HttpMessageNotReadableException.class,
             IllegalArgumentException.class
     })
