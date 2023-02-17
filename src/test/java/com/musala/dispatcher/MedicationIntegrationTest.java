@@ -139,8 +139,8 @@ public class MedicationIntegrationTest {
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {"0", "_", "A"})
-    public void testNotFoundGet(String serialNumber) throws Exception {
-        mvc.perform(get("/medications/" + serialNumber)
+    public void testNotFoundGet(String code) throws Exception {
+        mvc.perform(get("/medications/" + code)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

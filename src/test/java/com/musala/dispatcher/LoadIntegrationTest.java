@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -176,6 +178,31 @@ public class LoadIntegrationTest {
                 .getLoads().size());
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"", "{", "}", "/", "\\"})
+    public void testWrongPost(String content) throws Exception {
+        Drone drone = DroneProvider.provideDrones().findFirst().get();
+        droneRepository.save(drone);
+
+        mvc.perform(post("/drones/" + drone.getSerialNumber() + "/medications")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
+                .andExpect(status().isBadRequest());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"0", "_", "A"})
+    public void testNotFoundGet(String code) throws Exception {
+        Drone drone = DroneProvider.provideDrones().findFirst().get();
+        droneRepository.save(drone);
+
+        mvc.perform(get("/drones/" + drone.getSerialNumber()
+                        + "/medications/" + code)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
     @Test
     public void testDuplicatePost() throws Exception {
         Medication medication = MedicationProvider.provideMedications().findFirst().get();
@@ -210,7 +237,7 @@ public class LoadIntegrationTest {
     }
 
     @Test
-    public void testDependenciesDelete() {
+    public void testDependenciesDelete() throws Exception {
         Medication medication = MedicationProvider.provideMedications().findFirst().get();
         Drone drone = DroneProvider.provideDrones().findFirst().get()
                 .setWeightLimit(medication.getWeight());
