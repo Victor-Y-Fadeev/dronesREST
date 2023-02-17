@@ -11,7 +11,7 @@ public class LoadProvider {
 
     public static Stream<Arguments> provideLoads() {
         return provideReducedDrones()
-                .map(drone -> drone.setWeightLimit(250))
+                .peek(drone -> drone.setWeightLimit(250))
                 .flatMap(drone -> provideReducedMedications()
                         .filter(medication -> medication.getWeight() <= drone.getWeightLimit())
                         .map(medication -> Arguments.of(drone, medication)));

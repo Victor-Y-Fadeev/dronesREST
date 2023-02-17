@@ -14,12 +14,12 @@ public class MedicationProvider {
                 .flatMap(medication -> Stream.concat(
                         Stream.concat(Stream.of(null, "_", "-"), characterRange('a', 'z')),
                                 Stream.concat(characterRange('A', 'Z'), characterRange('0', '9')))
-                        .map(name -> medication.setName(name)))
+                        .map(medication::setName))
                 .flatMap(medication -> Stream.of(1, 250, 1000)
-                        .map(weight -> medication.setWeight(weight)))
+                        .map(medication::setWeight))
                 .flatMap(medication -> Stream.of(null, "http://musala.com", "file://musala.com")
-                        .map(image -> medication.setImage(image)))
-                .map(medication -> medication.setCode(
+                        .map(medication::setImage))
+                .peek(medication -> medication.setCode(
                         ofNullable(medication.getName())
                                 .orElse("NULL")
                                 .toUpperCase()
@@ -33,13 +33,13 @@ public class MedicationProvider {
     public static Stream<Medication> provideWrongNameMedications() {
         return Stream.of(provideMedications().findFirst().get())
                 .flatMap(medication -> Stream.of("", " ", "\t", "\\")
-                        .map(name -> medication.setName(name)));
+                        .map(medication::setName));
     }
 
     public static Stream<Medication> provideWrongWeightMedications() {
         return Stream.of(provideMedications().findFirst().get())
                 .flatMap(medication -> Stream.of(null, 0, -1, Integer.MIN_VALUE)
-                        .map(weight -> medication.setWeight(weight)));
+                        .map(medication::setWeight));
     }
 
     public static Stream<Medication> provideWrongCodeMedications() {
@@ -47,7 +47,7 @@ public class MedicationProvider {
                 .flatMap(medication -> Stream.concat(
                         Stream.of(null, "", " ", "\t", "\\", "-"),
                                 characterRange('a', 'z'))
-                        .map(code -> medication.setCode(code)));
+                        .map(medication::setCode));
     }
 
     private static Stream<String> characterRange(char fst, char snd) {

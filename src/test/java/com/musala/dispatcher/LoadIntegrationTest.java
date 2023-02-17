@@ -68,7 +68,7 @@ public class LoadIntegrationTest {
                 .andExpect(jsonPath("weight").value(medication.getWeight()))
                 .andExpect(jsonPath("code").value(medication.getCode()))
                 .andExpect(jsonPath("image").value(medication.getImage()))
-                .andExpect(jsonPath("count").value(1));;
+                .andExpect(jsonPath("count").value(1));
     }
 
     @ParameterizedTest
@@ -136,7 +136,7 @@ public class LoadIntegrationTest {
     }
 
     @Test
-    public void testTryToOverridePatch() throws Exception {
+    public void testOverridePatch() throws Exception {
         Medication medication = MedicationProvider.provideMedications()
                 .filter(current -> current.getName() != null).findFirst().get();
         Drone drone = DroneProvider.provideDrones().findFirst().get()
@@ -156,7 +156,7 @@ public class LoadIntegrationTest {
     }
 
     @Test
-    public void testDependenciesDelete() throws Exception {
+    public void testDependenciesDelete() {
         Medication medication = MedicationProvider.provideMedications().findFirst().get();
         Drone drone = DroneProvider.provideDrones().findFirst().get()
                 .setWeightLimit(medication.getWeight());

@@ -17,10 +17,10 @@ public class DroneProvider {
     public static Stream<Drone> provideDefaultDrones() {
         return Stream.of(new Drone())
                 .flatMap(drone -> Arrays.stream(Model.values())
-                        .map(model -> drone.setModel(model)))
+                        .map(drone::setModel))
                 .flatMap(drone -> Stream.of(0, 500)
-                        .map(weightLimit -> drone.setWeightLimit(weightLimit)))
-                .map(drone -> drone.setSerialNumber(
+                        .map(drone::setWeightLimit))
+                .peek(drone -> drone.setSerialNumber(
                         drone.getWeightLimit() + drone.getModel().getCode()));
     }
 
@@ -32,24 +32,24 @@ public class DroneProvider {
     public static Stream<Drone> provideWrongSerialNumberDrones() {
         return Stream.of(provideDefaultDrones().findFirst().get())
                 .flatMap(drone -> Stream.of(null, "", " ", "\t", "0".repeat(101))
-                        .map(serialNumber -> drone.setSerialNumber(serialNumber)));
+                        .map(drone::setSerialNumber));
     }
 
     public static Stream<Drone> provideWrongWeightLimitDrones() {
         return Stream.of(provideDefaultDrones().findFirst().get())
                 .flatMap(drone -> Stream.of(null, -1, 501, Integer.MIN_VALUE, Integer.MAX_VALUE)
-                        .map(weightLimit -> drone.setWeightLimit(weightLimit)));
+                        .map(drone::setWeightLimit));
     }
 
     public static Stream<Drone> provideWrongBatteryCapacityDrones() {
         return Stream.of(provideDefaultDrones().findFirst().get())
                 .flatMap(drone -> Stream.of(-1, 101, Integer.MIN_VALUE, Integer.MAX_VALUE)
-                        .map(batteryCapacity -> drone.setBatteryCapacity(batteryCapacity)));
+                        .map(drone::setBatteryCapacity));
     }
 
     public static Stream<Drone> provideWrongStateAndBatteryCapacityDrones() {
         return provideAllDrones()
-                .filter(drone -> isWrongStateAndBatteryCapacity(drone));
+                .filter(DroneProvider::isWrongStateAndBatteryCapacity);
     }
 
     public static Stream<Arguments> provideFilteringDronesByState() {
@@ -93,10 +93,10 @@ public class DroneProvider {
     private static Stream<Drone> provideAllDrones() {
         return provideDefaultDrones()
                 .flatMap(drone -> Stream.of(0, 25, 100)
-                        .map(batteryCapacity -> drone.setBatteryCapacity(batteryCapacity)))
+                        .map(drone::setBatteryCapacity))
                 .flatMap(drone -> Arrays.stream(State.values())
-                        .map(state -> drone.setState(state)))
-                .map(drone -> drone.setSerialNumber(
+                        .map(drone::setState))
+                .peek(drone -> drone.setSerialNumber(
                         drone.getWeightLimit()
                                 + drone.getModel().getCode()
                                 + drone.getState().ordinal()

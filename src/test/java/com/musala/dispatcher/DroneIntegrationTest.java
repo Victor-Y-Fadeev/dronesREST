@@ -167,7 +167,7 @@ public class DroneIntegrationTest {
     @MethodSource("com.musala.dispatcher.DroneProvider#provideFilteringDronesByState")
     public void testDroneFilteringByState(Collection<Drone> list,
                                           State state) throws Exception {
-        list.forEach(repository::save);
+        repository.saveAll(list);
 
         mvc.perform(get("/drones?state=" + state.name())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -183,7 +183,7 @@ public class DroneIntegrationTest {
     @MethodSource("com.musala.dispatcher.DroneProvider#provideFilteringDronesByBatteryCapacity")
     public void testDroneFilteringByState(Collection<Drone> list,
                                           Integer batteryCapacity) throws Exception {
-        list.forEach(repository::save);
+        repository.saveAll(list);
 
         mvc.perform(get("/drones?battery=" + batteryCapacity)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -199,7 +199,7 @@ public class DroneIntegrationTest {
     @MethodSource("com.musala.dispatcher.DroneProvider#provideFilteringDronesByStateAndBatteryCapacity")
     public void testDroneFilteringByStateAndBatteryCapacity(Collection<Drone> list,
                                                             State state, Integer batteryCapacity) throws Exception {
-        list.forEach(repository::save);
+        repository.saveAll(list);
 
         mvc.perform(get("/drones?state=" + state.name() + "&battery=" + batteryCapacity)
                         .contentType(MediaType.APPLICATION_JSON))
