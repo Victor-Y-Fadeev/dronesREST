@@ -42,6 +42,7 @@ public class LoadProvider {
     private static Stream<Medication> provideReducedMedications() {
         return MedicationProvider.provideMedications()
                 .filter(medication -> medication.getName() == null)
-                .filter(medication -> medication.getImage() == null);
+                .filter(medication -> medication.getImage() == null)
+                .peek(medication -> medication.setName("MEDICATION"));
     }
 }
