@@ -44,6 +44,10 @@ public class LoadServiceImpl implements LoadService {
         Drone drone = findDroneById(droneId);
         Load load = buildLoadRequest(drone, request);
 
+        if (drone.getLoads().contains(load)) {
+            throw new IllegalArgumentException("Medication " + request.getCode() + " is already there");
+        }
+
         drone.getLoads().add(load);
         droneRepository.save(drone);
     }
@@ -122,7 +126,7 @@ public class LoadServiceImpl implements LoadService {
 
     private void loadValidate(@NotNull Load load) {
         if (load.getDrone().getLoads().stream()
-                .filter(droneLoad -> !droneLoad.getMedication().getCode().equals(load.getMedication().getCode()))
+                .filter(droneLoad -> !droneLoad.getMedication().equals(load.getMedication()))
                 .mapToInt(droneLoad ->
                         droneLoad.getMedication().getWeight() * ofNullable(load.getCount()).orElse(1)).sum()
                 + load.getMedication().getWeight() * ofNullable(load.getCount()).orElse(1)
