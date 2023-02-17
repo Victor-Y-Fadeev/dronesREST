@@ -22,8 +22,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -124,22 +123,43 @@ public class LoadIntegrationTest {
     }
 
     @Test
-    public void testDuplicateLoadPost() throws Exception {
+    public void testDuplicatePost() throws Exception {
         Medication medication = MedicationProvider.provideMedications().findFirst().get();
-        Drone drone = DroneProvider.provideDefaultDrones().findFirst().get();
+        Drone drone = DroneProvider.provideDrones().findFirst().get()
+                .setWeightLimit(medication.getWeight());
         saveLoad(drone, medication);
 
-        mvc.perform(post("/drones/"
-                        + drone.getSerialNumber() + "/medications")
+        mvc.perform(post("/drones/" + drone.getSerialNumber() + "/medications")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loadToRequest(medication)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    public void testTryToOverridePatch() throws Exception {
+        Medication medication = MedicationProvider.provideMedications()
+                .filter(current -> current.getName() != null).findFirst().get();
+        Drone drone = DroneProvider.provideDrones().findFirst().get()
+                .setWeightLimit(medication.getWeight());
+        saveLoad(drone, medication);
+
+        String name = medication.getName();
+        mvc.perform(patch("/drones/" + drone.getSerialNumber()
+                        + "/medications/" + medication.getCode())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loadToRequest(medication.setName(name + name))))
+                .andExpect(status().isOk());
+
+        Load load = droneRepository.findById(drone.getSerialNumber()).get()
+                .getLoads().stream().findFirst().get();
+        assertNotEquals(name, load.getMedication().getName());
+    }
+
+    @Test
     public void testDependenciesDelete() throws Exception {
-        Drone drone = DroneProvider.provideDrones().findFirst().get();
         Medication medication = MedicationProvider.provideMedications().findFirst().get();
+        Drone drone = DroneProvider.provideDrones().findFirst().get()
+                .setWeightLimit(medication.getWeight());
 
         assertEquals(0, medicationRepository.count());
         medicationRepository.save(medication);

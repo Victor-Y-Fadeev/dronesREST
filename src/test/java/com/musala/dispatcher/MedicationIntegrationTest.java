@@ -146,7 +146,7 @@ public class MedicationIntegrationTest {
     }
 
     @Test
-    public void testDuplicateMedicationPost() throws Exception {
+    public void testDuplicatePost() throws Exception {
         Medication medication = MedicationProvider.provideMedications().findFirst().get();
         repository.save(medication);
 
