@@ -303,7 +303,7 @@ public class LoadIntegrationTest {
 
         Load load = droneRepository.findById(drone.getSerialNumber()).get()
                 .getLoads().stream().findFirst().get();
-        assertNotEquals(name, load.getMedication().getName());
+        assertEquals(name, load.getMedication().getName());
     }
 
     @Test

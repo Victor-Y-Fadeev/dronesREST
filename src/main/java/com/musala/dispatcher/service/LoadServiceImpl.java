@@ -4,8 +4,8 @@ import com.musala.dispatcher.data.CreateLoadRequest;
 import com.musala.dispatcher.data.LoadResponse;
 import com.musala.dispatcher.entity.Drone;
 import com.musala.dispatcher.entity.Load;
-import com.musala.dispatcher.entity.Medication;
 import com.musala.dispatcher.repository.DroneRepository;
+import com.musala.dispatcher.repository.MedicationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,6 +20,7 @@ import static java.util.Optional.ofNullable;
 @Service
 @AllArgsConstructor
 public class LoadServiceImpl implements LoadService {
+    private MedicationRepository medicationRepository;
     private DroneRepository droneRepository;
 
     @NotNull
@@ -102,11 +103,9 @@ public class LoadServiceImpl implements LoadService {
     private Load buildLoadRequest(@NotNull Drone drone, @NotNull CreateLoadRequest request) {
         Load load = new Load().setDrone(drone)
                 .setCount(request.getCount())
-                .setMedication(new Medication()
-                                .setName(request.getName())
-                                .setWeight(request.getWeight())
-                                .setCode(request.getCode())
-                                .setImage(request.getImage()));
+                .setMedication(medicationRepository.findById(request.getCode())
+                        .orElseThrow(() ->
+                                new EntityNotFoundException("Medication " + request.getCode() + " is not found")));
 
         loadValidate(load);
         return load;
@@ -114,13 +113,6 @@ public class LoadServiceImpl implements LoadService {
 
     private void loadUpdate(@NotNull Load load, @NotNull CreateLoadRequest request) {
         ofNullable(request.getCount()).map(load::setCount);
-
-        Medication medication = load.getMedication();
-        ofNullable(request.getName()).map(medication::setName);
-        ofNullable(request.getWeight()).map(medication::setWeight);
-        ofNullable(request.getCode()).map(medication::setCode);
-        ofNullable(request.getImage()).map(medication::setImage);
-
         loadValidate(load);
     }
 
