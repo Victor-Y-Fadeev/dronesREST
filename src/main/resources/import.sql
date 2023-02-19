@@ -30,3 +30,16 @@ VALUES
 	('Egilok', 25, '10', NULL),
 	('Enap-H', 35, '11', NULL),
 	('Aquadetrim', 15, '12', NULL);
+
+INSERT INTO loads
+	(drone_serial_number, medication_code, count)
+VALUES
+	('3', '8', 1),
+	('4', '0', 1),
+	('5', '2', 2),
+	('6', '11', 1),
+	('6', '8', 1),
+	('7', '12', 2),
+	('7', '8', 2),
+	('8', '5', 1),
+	('9', '10', 2);
