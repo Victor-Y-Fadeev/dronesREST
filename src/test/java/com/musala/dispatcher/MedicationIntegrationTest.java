@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.musala.dispatcher.data.CreateMedicationRequest;
 import com.musala.dispatcher.entity.Medication;
 import com.musala.dispatcher.repository.MedicationRepository;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,6 +39,11 @@ public class MedicationIntegrationTest {
 
     @Autowired
     private MedicationRepository repository;
+
+    @BeforeEach
+    public void setup() {
+        repository.deleteAll();
+    }
 
     @ParameterizedTest
     @MethodSource("com.musala.dispatcher.MedicationProvider#provideMedications")
@@ -154,11 +159,6 @@ public class MedicationIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(medicationToRequest(medication)))
                 .andExpect(status().isBadRequest());
-    }
-
-    @AfterEach
-    public void cleanUp() {
-        repository.deleteAll();
     }
 
     private static String medicationToRequest(Medication medication) throws JsonProcessingException {

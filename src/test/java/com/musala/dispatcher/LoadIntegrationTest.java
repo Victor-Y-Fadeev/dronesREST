@@ -9,7 +9,7 @@ import com.musala.dispatcher.entity.Load;
 import com.musala.dispatcher.entity.Medication;
 import com.musala.dispatcher.repository.DroneRepository;
 import com.musala.dispatcher.repository.MedicationRepository;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,7 +24,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -44,6 +45,12 @@ public class LoadIntegrationTest {
 
     @Autowired
     private MedicationRepository medicationRepository;
+
+    @BeforeEach
+    public void setup() {
+        droneRepository.deleteAll();
+        medicationRepository.deleteAll();
+    }
 
     @ParameterizedTest
     @MethodSource("com.musala.dispatcher.LoadProvider#provideLoads")
@@ -332,12 +339,6 @@ public class LoadIntegrationTest {
         assertEquals(1, medicationRepository.count());
         medicationRepository.deleteAll();
         assertEquals(0, medicationRepository.count());
-    }
-
-    @AfterEach
-    public void cleanUp() {
-        droneRepository.deleteAll();
-        medicationRepository.deleteAll();
     }
 
     private void saveLoad(Drone drone, Medication medication) {

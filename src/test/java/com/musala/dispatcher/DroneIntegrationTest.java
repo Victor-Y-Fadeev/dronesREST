@@ -7,7 +7,7 @@ import com.musala.dispatcher.data.CreateDroneRequest;
 import com.musala.dispatcher.entity.Drone;
 import com.musala.dispatcher.entity.State;
 import com.musala.dispatcher.repository.DroneRepository;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,6 +43,11 @@ public class DroneIntegrationTest {
 
     @Autowired
     private DroneRepository repository;
+
+    @BeforeEach
+    public void setup() {
+        repository.deleteAll();
+    }
 
     @ParameterizedTest
     @MethodSource("com.musala.dispatcher.DroneProvider#provideDefaultDrones")
@@ -265,11 +270,6 @@ public class DroneIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(droneToRequest(drone)))
                 .andExpect(status().isBadRequest());
-    }
-
-    @AfterEach
-    public void cleanUp() {
-        repository.deleteAll();
     }
 
     private static String droneToRequest(Drone drone) throws JsonProcessingException {
