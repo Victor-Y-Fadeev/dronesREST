@@ -59,6 +59,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>dispatch-controller</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
