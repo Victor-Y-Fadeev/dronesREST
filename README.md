@@ -1,6 +1,18 @@
 ## Drones
 
-[[_TOC_]]
+To build, test and run the service:
+```
+docker-compose up
+```
+
+If you want to build and test it locally:
+```
+mvn clean verify
+```
+
+For local run you need to install [PostgreSQL](https://www.postgresql.org/) with:
+- Username: `postgres`
+- Password: `postgres`
 
 ---
 
